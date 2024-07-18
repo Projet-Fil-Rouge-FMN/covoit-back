@@ -120,35 +120,26 @@ public class Carpool {
     }
 
 
-
-    public Vehicle getVehicle() {
-        return vehicle;
+    /**
+     * Gets the vehicle associated with the reservation.
+     * 
+     * @return the vehicle associated with the reservation
+     */
+    public Vehicle getVehicule() {
+	return vehicle;
     }
 
+    /**
+     * Sets the vehicle associated with the reservation.
+     * 
+     * @param vehicle the vehicle associated with the reservation
+     */
 
 
-    public void setVehicle(Vehicle vehicle) {
-        this.vehicle = vehicle;
+
+    public void setVehicle(Vehicle mapToVehicleEntity) {
+	this.vehicle = mapToVehicleEntity;
+	
     }
-
-
-
-//    /**
-//     * Gets the vehicle associated with the reservation.
-//     * 
-//     * @return the vehicle associated with the reservation
-//     */
-//    public Vehicule getVehicule() {
-//	return vehicule;
-//    }
-//
-//    /**
-//     * Sets the vehicle associated with the reservation.
-//     * 
-//     * @param vehicle the vehicle associated with the reservation
-//     */
-//    public void setVehicule(Vehicule vehicule) {
-//	this.vehicule = vehicule;
-//    }
 
 }

@@ -32,7 +32,7 @@ public class UserAccountController {
 
     @PostMapping("/register")
     public void registerUser(@RequestBody UserAccountDTO userDTO) {
-        userAccountService.registerUser(userDTO);
+        //userAccountService.registerUser(userDTO);
     }
 
     @PutMapping("/update")
@@ -47,7 +47,7 @@ public class UserAccountController {
 
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable int id) {
-        userAccountService.deleteUser(id);
+        //userAccountService.deleteUser(id);
     }
 
     @GetMapping("/all")
@@ -61,22 +61,22 @@ public class UserAccountController {
     }
 
     @PostMapping("/logout/{id}")
-    public void logout(@PathVariable Long id) {
+    public void logout(@PathVariable int id) {
         userAccountService.logout(id);
     }
 
     @GetMapping("/{userId}/carpools")
-    public List<CarpoolDTO> getCarpoolInfo(@PathVariable Long userId) {
+    public List<CarpoolDTO> getCarpoolInfo(@PathVariable int userId) {
         return userAccountService.getCarpoolInfo(userId);
     }
 
     @PostMapping("/{userId}/book-carpool")
-    public void bookCarpool(@PathVariable Long userId, @RequestParam Long carpoolId) {
-        userAccountService.bookCarpool(carpoolId, userId);
+    public void bookCarpool(@PathVariable int userId, @RequestParam int carpoolId) {
+       // userAccountService.bookCarpool(carpoolId, userId);
     }
 
     @DeleteMapping("/{userId}/cancel-carpool")
-    public void cancelCarpool(@PathVariable Long userId, @RequestParam Long carpoolId) {
-        userAccountService.deleteBookingCarpool(carpoolId, userId);
+    public void cancelCarpool(@PathVariable int userId, @RequestParam int carpoolId) {
+      //  userAccountService.deleteBookingCarpool(carpoolId, userId);
     }
 }

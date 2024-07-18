@@ -13,7 +13,8 @@ public interface CarpoolRepositorry  extends JpaRepository<UserAccount, Integer>
 
 
     List<Carpool> findByUserAccounts_Id(int userId);
-    List<Carpool> fifindByI(int carpoolId);
+    List<Carpool> findByI(int carpoolId);
     void deleteById(int id);
+
 
 }

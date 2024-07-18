@@ -1,164 +1,152 @@
 package covoit.services;
 
+import covoit.dtos.CarpoolDTO;
+import covoit.dtos.UserAccountDTO;
+import covoit.entities.Carpool;
+import covoit.entities.Route;
+import covoit.entities.UserAccount;
+import covoit.entities.Vehicle;
+import covoit.repository.CarpoolRepositorry;
+import covoit.repository.UserAccountRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import covoit.dtos.UserAccountDTO;
-import covoit.entities.Address;
-import covoit.entities.UserAccount;
-import covoit.repository.UserAccountRepository;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserAccountService {
-@Autowired
-private UserAccountRepository userAccountRepository;
 
-@Autowired
-private PasswordEncoder passwordEncoder;
+    @Autowired
+    private UserAccountRepository userAccountRepository;
 
-public void save(UserAccount user) {
-	user.setPassword(passwordEncoder.encode(user.getPassword()));
-	userAccountRepository.save(user);
-}
+    @Autowired
+    private CarpoolRepositorry carpoolRepository;
 
-@Autowired
-private CarpoolRepository carpoolRepository;
+    public void registerUser(UserAccountDTO userDTO) {
+        UserAccount userAccount = mapToEntity(userDTO);
+        userAccountRepository.save(userAccount);
+    }
 
-@Override
-public void createCarpool(CarpoolDTO carpoolDTO) {
-    Carpool carpool = convertToEntity(carpoolDTO);
-    carpoolRepository.save(carpool);
-}
+    public void updateUser(UserAccountDTO userDTO) {
+        UserAccount userAccount = mapToEntity(userDTO);
+        userAccountRepository.save(userAccount);
+    }
 
-@Override
-public void updateCarpool(Long id, CarpoolDTO carpoolDTO) {
-    Carpool carpool = carpoolRepository.findById(id).orElseThrow(() -> new RuntimeException("Covoiturage non trouvé"));
-    carpool.setAvailableSeat(carpoolDTO.getAvailableSeat());
-    carpool.setStarDate(carpoolDTO.getStartDate());
-    carpool.setVehicle(convertToEntity(carpoolDTO.getVehicle()));
-    carpool.setRoute(convertToEntity(carpoolDTO.getRoute()));
-    carpool.setUserAccounts(carpoolDTO.getUserAccounts().stream().map(this::convertToEntity).collect(Collectors.toList()));
-    carpoolRepository.save(carpool);
-}
+    public UserAccountDTO findById(int id) {
+        UserAccount userAccount = userAccountRepository.findById(id).orElse(null);
+        return mapToDTO(userAccount);
+    }
 
-@Override
-public CarpoolDTO getCarpoolById(Long id) {
-    Carpool carpool = carpoolRepository.findById(id).orElseThrow(() -> new RuntimeException("Covoiturage non trouvé"));
-    return convertToDto(carpool);
-}
+    public void deleteUser(int id) {
+        userAccountRepository.deleteById(id);
+    }
 
-@Override
-public void deleteCarpool(Long id) {
-    carpoolRepository.deleteById(id);
-}
+    public List<UserAccountDTO> findAllUsers() {
+        List<UserAccount> users = userAccountRepository.findAll();
+        return users.stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
 
-@Override
-public List<CarpoolDTO> getAllCarpools() {
-    return carpoolRepository.findAll().stream().map(this::convertToDto).collect(Collectors.toList());
-}
+    public void login(String email, String password) {
+        // Implement login logic
+    }
 
-private Carpool convertToEntity(CarpoolDTO carpoolDTO) {
-    Carpool carpool = new Carpool();
-    carpool.setAvailableSeat(carpoolDTO.getAvailableSeat());
-    carpool.setStarDate(carpoolDTO.getStartDate());
-    carpool.setVehicle(convertToEntity(carpoolDTO.getVehicle()));
-    carpool.setRoute(convertToEntity(carpoolDTO.getRoute()));
-    carpool.setUserAccounts(carpoolDTO.getUserAccounts().stream().map(this::convertToEntity).collect(Collectors.toList()));
-    return carpool;
-}
+    public void logout(int id) {
+        // Implement logout logic
+    }
 
-private CarpoolDTO convertToDto(Carpool carpool) {
-    CarpoolDTO carpoolDTO = new CarpoolDTO();
-    carpoolDTO.setId(carpool.getId());
-    carpoolDTO.setAvailableSeat(carpool.getAvailableSeat());
-    carpoolDTO.setStartDate(carpool.getStarDate());
-    carpoolDTO.setVehicle(convertToDto(carpool.getVehicle()));
-    carpoolDTO.setRoute(convertToDto(carpool.getRoute()));
-    carpoolDTO.setUserAccounts(carpool.getUserAccounts().stream().map(this::convertToDto).collect(Collectors.toList()));
-    return carpoolDTO;
-}
+    public List<CarpoolDTO> getCarpoolInfo(int userId) {
+        UserAccount userAccount = userAccountRepository.findById(userId).orElse(null);
+        return userAccount.getCarpools().stream().map(this::mapToCarpoolDTO).collect(Collectors.toList());
+    }
 
-private VehicleDTO convertToDto(Vehicle vehicle) {
-    VehicleDTO vehicleDTO = new VehicleDTO();
-    vehicleDTO.setId(vehicle.getId());
-    vehicleDTO.setRegistration(vehicle.getRegistration());
-    vehicleDTO.setNbSeat(vehicle.getNbSeat());
-    vehicleDTO.setBrand(convertToDto(vehicle.getBrand()));
-    vehicleDTO.setModel(convertToDto(vehicle.getModel()));
-    vehicleDTO.setCategory(convertToDto(vehicle.getCategory()));
-    return vehicleDTO;
-}
+    public void bookCarpool(int userId, int carpoolId) {
+        UserAccount user = userAccountRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        UserAccount carpool = carpoolRepository.findById(carpoolId).orElseThrow(() -> new RuntimeException("Carpool not found"));
+        user.getCarpools().addAll((Collection<? extends Carpool>) carpool);
+        userAccountRepository.save(user);
+    }
 
-private RouteDTO convertToDto(Route route) {
-    RouteDTO routeDTO = new RouteDTO();
-    routeDTO.setId(route.getId());
-    routeDTO.setDuration(route.getDuration());
-    routeDTO.setKmTotal(route.getKmTotal());
-    routeDTO.setStartAddress(convertToDto(route.getStartAddress()));
-    routeDTO.setEndAddress(convertToDto(route.getEndAddress()));
-    return routeDTO;
-}
+    public void cancelCarpool(int userId, int carpoolId) {
+        UserAccount user = userAccountRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        UserAccount carpool = carpoolRepository.findById(carpoolId).orElseThrow(() -> new RuntimeException("Carpool not found"));
+        user.getCarpools().remove(carpool);
+        userAccountRepository.save(user);
+    }
 
-private UserAccountDTO convertToDto(UserAccount user) {
-    UserAccountDTO userDTO = new UserAccountDTO();
-    userDTO.setId(user.getId());
-    userDTO.setName(user.getName());
-    userDTO.setLastName(user.getLastName());
-    userDTO.setDriverLicence(user.isDriverLicence());
-    userDTO.setPassword(user.getPassword());
-    return userDTO;
-}
 
-private Vehicle convertToEntity(VehicleDTO vehicleDTO) {
-    Vehicle vehicle = new Vehicle();
-    vehicle.setId(vehicleDTO.getId());
-    vehicle.setRegistration(vehicleDTO.getRegistration());
-    vehicle.setNbSeat(vehicleDTO.getNbSeat());
-    vehicle.setBrand(convertToEntity(vehicleDTO.getBrand()));
-    vehicle.setModel(convertToEntity(vehicleDTO.getModel()));
-    vehicle.setCategory(convertToEntity(vehicleDTO.getCategory()));
-    return vehicle;
-}
+    private UserAccount mapToEntity(UserAccountDTO userDTO) {
+        UserAccount userAccount = new UserAccount();
+        userAccount.setId(userDTO.getId());
+        userAccount.setName(userDTO.getName());
+        userAccount.setLastName(userDTO.getLastName());
+        userAccount.setDriverLicence(userDTO.isDriverLicence());
+        userAccount.setPassword(userDTO.getPassword());
+        List<Carpool> carpools = userDTO.getCarpools().stream().map(this::mapToCarpoolEntity).collect(Collectors.toList());
+        userAccount.setCarpools(carpools);
+        return userAccount;
+    }
 
-private Route convertToEntity(RouteDTO routeDTO) {
-    Route route = new Route();
-    route.setId(routeDTO.getId());
-    route.setDuration(routeDTO.getDuration());
-    route.setKmTotal(routeDTO.getKmTotal());
-    route.setStartAddress(convertToEntity(routeDTO.getStartAddress()));
-    route.setEndAddress(convertToEntity(routeDTO.getEndAddress()));
-    return route;
-}
+    private UserAccountDTO mapToDTO(UserAccount userAccount) {
+        UserAccountDTO userDTO = new UserAccountDTO();
+        userDTO.setId(userAccount.getId());
+        userDTO.setName(userAccount.getName());
+        userDTO.setLastName(userAccount.getLastName());
+        userDTO.setDriverLicence(userAccount.isDriverLicence());
+        userDTO.setPassword(userAccount.getPassword());
+        List<CarpoolDTO> carpoolDTOs = userAccount.getCarpools().stream().map(this::mapToCarpoolDTO).collect(Collectors.toList());
+        userDTO.setCarpools(carpoolDTOs);
+        return userDTO;
+    }
 
-private UserAccount convertToEntity(UserAccountDTO userDTO) {
-    UserAccount user = new UserAccount();
-    user.setId(userDTO.getId());
-    user.setName(userDTO.getName());
-    user.setLastName(userDTO.getLastName());
-    user.setDriverLicence(userDTO.isDriverLicence());
-    user.setPassword(userDTO.getPassword());
-    return user;
-}
+    private CarpoolDTO mapToCarpoolDTO(Carpool carpool) {
+        CarpoolDTO carpoolDTO = new CarpoolDTO();
+        carpoolDTO.setId(carpool.getId());
+        carpoolDTO.setAvailableSeat(carpool.getAvailableSeat());
+        carpoolDTO.setStartDate(carpool.getStarDate());
+        carpoolDTO.setVehicle(mapToVehicleDTO(carpool.getVehicule()));
+       // carpoolDTO.setRoute(mapToRouteDTO(carpool.getRoute()));
+        List<UserAccountDTO> userDTOs = carpool.getUserAccounts().stream().map(this::mapToDTO).collect(Collectors.toList());
+        carpoolDTO.setUserAccounts(userDTOs);
+        return carpoolDTO;
+    }
 
-private Address convertToDto(Address address) {
-     address = new Address();
-    address.setId(address.getId());
-    address.setStreet(address.getStreet());
-    address.setCity(address.getCity());
-    address.setZipCode(address.getZipCode());
-    address.setCountry(address.getCountry());
-    return address;
-}
+    private Vehicle mapToVehicleDTO(Vehicle vehicule) {
+	// TODO Auto-generated method stub
+	return null;
+    }
 
-private Address convertToEntity(AddressDTO addressDTO) {
-    Address address = new Address();
-    address.setId(addressDTO.getId());
-    address.setStreet(addressDTO.getStreet());
-    address.setCity(addressDTO.getCity());
-    address.setZipCode(addressDTO.getZipCode());
-    address.setCountry(addressDTO.getCountry());
-    return address;
-}
+    private Carpool mapToCarpoolEntity(CarpoolDTO carpoolDTO) {
+        Carpool carpool = new Carpool();
+        carpool.setId(carpoolDTO.getId());
+        carpool.setAvailableSeat(carpoolDTO.getAvailableSeat());
+        carpool.setStarDate(carpoolDTO.getStartDate());
+        carpool.setVehicle(mapToVehicleEntity(carpoolDTO.getVehicle()));
+        //carpool.setRoute(mapToRouteEntity(carpoolDTO.getRoute()));
+        List<UserAccount> users = carpoolDTO.getUserAccounts().stream().map(this::mapToEntity).collect(Collectors.toList());
+        carpool.setUserAccounts(users);
+        return carpool;
+    }
 
+    private Vehicle mapToVehicle(Vehicle vehicle) {
+	return vehicle;
+        // Implement the mapping logic from Vehicle entity to VehicleDTO
+    }
+
+    private Vehicle mapToVehicleEntity(Vehicle vehicleDTO) {
+	return vehicleDTO;
+        // Implement the mapping logic from VehicleDTO to Vehicle entity
+    }
+//
+//    private Route mapToRouteDTO(Route route) {
+//	return route;
+//        // Implement the mapping logic from Route entity to RouteDTO
+//    }
+//
+//    private Route mapToRouteEntity(Route routeDTO) {
+//	return routeDTO;
+//        // Implement the mapping logic from RouteDTO to Route entity
+//    }
 }

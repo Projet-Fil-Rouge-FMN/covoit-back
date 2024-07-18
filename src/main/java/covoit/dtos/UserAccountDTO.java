@@ -7,7 +7,6 @@ public class UserAccountDTO {
     private int id;
     private String name;
     private String lastName;
-
     private boolean driverLicence;
     private String password;
     private List<CarpoolDTO> carpools;

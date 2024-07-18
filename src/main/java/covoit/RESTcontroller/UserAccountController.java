@@ -1,4 +1,4 @@
-package covoit.controller;
+package covoit.RESTcontroller;
 
 import java.util.List;
 
@@ -41,12 +41,12 @@ public class UserAccountController {
     }
 
     @GetMapping("/{id}")
-    public UserAccountDTO findById(@PathVariable Long id) {
+    public UserAccountDTO findById(@PathVariable int id) {
         return userAccountService.findById(id);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable Long id) {
+    public void deleteUser(@PathVariable int id) {
         userAccountService.deleteUser(id);
     }
 

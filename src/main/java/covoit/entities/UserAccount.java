@@ -14,7 +14,7 @@ public class UserAccount {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private int id;
 	private String name;
 	private String lastName;
 	private boolean driverLicence;
@@ -45,7 +45,7 @@ public class UserAccount {
      * 
      * @return the unique identifier of the user
      */
-	public Long getId() {
+	public int getId() {
 		return id;
 	}
     /**
@@ -53,7 +53,7 @@ public class UserAccount {
      * 
      * @param id the unique identifier of the user
      */
-	public void setId(Long id) {
+	public void setId(int id) {
 		this.id = id;
 	}
     /**

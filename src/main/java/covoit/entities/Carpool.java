@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
 /**
  * Represents a reservation in the carpooling system.
@@ -20,14 +21,14 @@ import jakarta.persistence.ManyToOne;
 public class Carpool {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
     private int availableSeat;
     private LocalDate starDate;
 
+    @OneToMany
+    private Vehicle vehicle;
+ 
 
-
-//    @ManyToOne
-//    private Vehicule vehicule;
 
     @ManyToOne
     private Route route;
@@ -47,7 +48,7 @@ public class Carpool {
      * 
      * @return the unique identifier of the reservation
      */
-    public Long getId() {
+    public int getId() {
 	return id;
     }
 
@@ -56,7 +57,7 @@ public class Carpool {
      * 
      * @param id the unique identifier of the reservation
      */
-    public void setId(Long id) {
+    public void setId(int id) {
 	this.id = id;
     }
 
@@ -116,6 +117,18 @@ public class Carpool {
      */
     public List<UserAccount> getUserAccounts() {
         return userAccounts;
+    }
+
+
+
+    public Vehicle getVehicle() {
+        return vehicle;
+    }
+
+
+
+    public void setVehicle(Vehicle vehicle) {
+        this.vehicle = vehicle;
     }
 
 

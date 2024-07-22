@@ -47,13 +47,14 @@ public class UserAccountController {
 
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable int id) {
-        //userAccountService.deleteUser(id);
+        userAccountService.deleteUser(id);
     }
 
     @GetMapping("/all")
     public List<UserAccountDTO> findAllUsers() {
         return userAccountService.findAllUsers();
     }
+    
 
     @PostMapping("/login")
     public void login(@RequestParam String email, @RequestParam String password) {
@@ -72,11 +73,11 @@ public class UserAccountController {
 
     @PostMapping("/{userId}/book-carpool")
     public void bookCarpool(@PathVariable int userId, @RequestParam int carpoolId) {
-       // userAccountService.bookCarpool(carpoolId, userId);
+        userAccountService.bookCarpool(carpoolId, userId);
     }
 
     @DeleteMapping("/{userId}/cancel-carpool")
     public void cancelCarpool(@PathVariable int userId, @RequestParam int carpoolId) {
-      //  userAccountService.deleteBookingCarpool(carpoolId, userId);
+      //S  userAccountService.deleteBookingCarpool(carpoolId, userId);
     }
 }

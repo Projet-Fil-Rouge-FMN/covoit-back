@@ -1,5 +1,6 @@
 package covoit.RESTcontroller;
 
+import covoit.dtos.LoginRequest;
 import covoit.entities.UserAccount;
 import covoit.exception.AnomalieException;
 import covoit.services.UserAccountService;
@@ -23,14 +24,13 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
         try {
-            UserAccount user = userAccountService.login(loginRequest.getUsername(), loginRequest.getPassword());
-            HttpSession session = request.getSession();
-            session.setAttribute("user", user); // Stocker l'utilisateur dans la session
-            return ResponseEntity.ok(user);
+            UserAccount authenticatedUser = userAccountService.login(loginRequest.getUserName(), loginRequest.getPassword());
+            return ResponseEntity.ok(authenticatedUser);
         } catch (AnomalieException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+            return ResponseEntity.status(401).body(e.getMessage());
         }
     }
+    
 
     @GetMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request) {
@@ -41,25 +41,5 @@ public class AuthController {
         return ResponseEntity.ok("Déconnecté");
     }
 
-    public static class LoginRequest {
-        private String username;
-        private String password;
-
-        // Getters et Setters
-        public String getUsername() {
-            return username;
-        }
-
-        public void setUsername(String username) {
-            this.username = username;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-
-        public void setPassword(String password) {
-            this.password = password;
-        }
-    }
+  
 }

@@ -1,22 +1,24 @@
 package covoit.entities;
 
-import java.util.List;
-
-import jakarta.persistence.ElementCollection;
-
-
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 
 
 /**
@@ -34,7 +36,11 @@ public class UserAccount {
     private String password;
     private String email;
     private boolean driverLicence;
-
+    @ManyToMany
+    @JoinTable(name = "user_carpool",
+               joinColumns = @JoinColumn(name = "user_id"),
+               inverseJoinColumns = @JoinColumn(name = "carpool_id"))
+    private Set<Carpool> carpools = new HashSet<>();
     @ElementCollection(fetch = FetchType.EAGER)
     private List<GrantedAuthority> authorities= new ArrayList<>();
     
@@ -142,6 +148,24 @@ public class UserAccount {
 		return "UserAccount [id=" + id + ", userName=" + userName + ", lastName=" + lastName + ", password=" + password
 				+ ", email=" + email + ", driverLicence=" + driverLicence + ", authorities=" + authorities + "]";
 	}
+	public Set<Carpool> getCarpools() {
+        return carpools;
+    }
+
+    public void setCarpools(Set<Carpool> carpools) {
+        this.carpools = carpools;
+    }
+
+    // Method to add a carpool
+    public void addCarpool(Carpool carpool) {
+        this.carpools.add(carpool);
+    }
+
+    // Method to remove a carpool
+    public void removeCarpool(Carpool carpool) {
+        this.carpools.remove(carpool);
+    }
+
 
 
 	

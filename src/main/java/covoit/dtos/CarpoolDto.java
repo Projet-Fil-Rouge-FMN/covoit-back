@@ -2,6 +2,7 @@ package covoit.dtos;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import covoit.entities.Carpool;
 import covoit.entities.Route;
@@ -15,6 +16,7 @@ public class CarpoolDto {
 	private Route route;
 	private List<UserAccountDto> userAccounts;
 
+
 	public CarpoolDto toDTO(Carpool object) {
 		CarpoolDto carpoolDTO = new CarpoolDto();
 		carpoolDTO.setId(object.getId());
@@ -22,8 +24,9 @@ public class CarpoolDto {
 		carpoolDTO.setRoute(object.getRoute());
 		carpoolDTO.setVehicle(object.getVehicle());
 		carpoolDTO.setAvailableSeat(object.getAvailableSeat());
-		// TODO : See how contradiction between CarpoolDTO and Carpool should be handled
-		// carpoolDTO.setUserAccounts(object.getUserAccounts());
+		carpoolDTO.setUserAccounts(object.getUserAccounts().stream()
+	            .map(userAccount -> new UserAccountDto().toDto(userAccount))
+	            .collect(Collectors.toList()));
 		return carpoolDTO;
 	}
 
@@ -34,8 +37,7 @@ public class CarpoolDto {
 		carpool.setVehicle(object.getVehicle());
 		carpool.setAvailableSeat(object.getAvailableSeat());
 		return carpool;
-		// TODO : See how contradiction between CarpoolDTO and Carpool should be handled
-		// carpool.setUserAccounts(object.getUserAccounts()); return null;
+
 	}
 
 	// Getters and setters
@@ -87,5 +89,7 @@ public class CarpoolDto {
 	public void setUserAccounts(List<UserAccountDto> userAccounts) {
 		this.userAccounts = userAccounts;
 	}
+
+
 
 }

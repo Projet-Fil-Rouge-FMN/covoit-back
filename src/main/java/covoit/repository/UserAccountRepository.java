@@ -22,7 +22,8 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, Intege
 
 	Iterable<UserAccount> findByUserNameAndPassword(String userName, String password);
 
-	UserAccount findById(int id);
+	   UserAccount findById(int id);
+
 	UserAccount findByEmail(String email);
 	UserAccount findByUserName(String userName);
 	List<UserAccount> findAll();

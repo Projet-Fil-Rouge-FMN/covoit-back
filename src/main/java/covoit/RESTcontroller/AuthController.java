@@ -1,6 +1,7 @@
 package covoit.RESTcontroller;
 
-import covoit.dtos.LoginRequest;
+import covoit.dtos.LoginRequestDto;
+import covoit.dtos.UserAccountDto;
 import covoit.entities.UserAccount;
 import covoit.exception.AnomalieException;
 import covoit.services.UserAccountService;
@@ -21,13 +22,20 @@ public class AuthController {
         this.userAccountService = userAccountService;
     }
 
+    /**
+     * Endpoint pour la connexion des utilisateurs.
+     * 
+     * @param loginRequest un objet contenant le nom d'utilisateur et le mot de passe
+     * @return un objet UserAccountDto si la connexion est réussie, sinon un message d'erreur
+     */
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
+   
+    public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequest) {
         try {
-            UserAccount authenticatedUser = userAccountService.login(loginRequest.getUserName(), loginRequest.getPassword());
-            return ResponseEntity.ok(authenticatedUser);
+            UserAccountDto authenticatedUser = userAccountService.login(loginRequest);
+            return ResponseEntity.ok(authenticatedUser); // Répond avec le DTO de l'utilisateur authentifié
         } catch (AnomalieException e) {
-            return ResponseEntity.status(401).body(e.getMessage());
+            return ResponseEntity.status(401).body(e.getMessage()); // Répond avec une erreur 401 en cas d'échec
         }
     }
     

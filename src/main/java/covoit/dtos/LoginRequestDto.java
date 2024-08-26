@@ -1,8 +1,14 @@
 package covoit.dtos;
 
-public class LoginRequest {
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class LoginRequestDto {
     private String userName;
     private String password;
+
+  
+
 
     // Getters and Setters
     public String getUserName() {

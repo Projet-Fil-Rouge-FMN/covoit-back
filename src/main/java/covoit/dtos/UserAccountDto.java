@@ -1,5 +1,6 @@
 package covoit.dtos;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -17,7 +18,7 @@ public class UserAccountDto {
 	private String email;
 	private boolean driverLicence;
 	private String password;
-	private List<CarpoolDto> carpools;
+	private List<CarpoolDto> carpools = new ArrayList<>();
 	private String role;
 
 	
@@ -30,6 +31,7 @@ public class UserAccountDto {
 		userDto.setDriverLicence(user.isDriverLicence());
 		userDto.setPassword(user.getPassword());
 		userDto.setRole(user.getAuthorities().toString());
+		userDto.setCarpools(carpools);
 		return userDto;
 	}
 	public UserAccount toBean(UserAccountDto userDto) {

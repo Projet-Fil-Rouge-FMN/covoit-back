@@ -8,5 +8,6 @@ pipeline {
             steps {
                 git url: 'https://github.com/Projet-Fil-Rouge-FMN/covoit-back.git'
             }
-        }}
+        }
+    }
 }

@@ -7,7 +7,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/Projet-Fil-Rouge-FMN/covoit-back'
+                git branch: 'main', url: 'https://github.com/ssdfred/covoit-back'
             }
         }
         stage('Build') {
@@ -25,17 +25,26 @@ pipeline {
                 }
             }
         }
-        stage('Code Coverage') {
+         stage('Code Coverage') {
             steps {
-                jacoco execPattern: '**/target/*.exec'
+                // Running JaCoCo for code coverage.
+                sh 'mvn jacoco:report'
+            }
+            post {
+                always {
+                    // Archiving the code coverage report.
+                    jacoco execPattern: '**/target/jacoco.exec'
+                }
             }
         }
         stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('SonarQubeServer') {
-                    sh 'mvn sonar:sonar'
-                }
-            }
+           steps {
+				script {
+				def mvnHome = tool 'Maven 3.9.9' 
+				withSonarQubeEnv('SonarQC') {
+					sh "${mvnHome}/bin/mvn clean verify sonar:sonar -Dsonar.projectKey=covoit -Dsonar.projectName='covoit'"
+				}
+ 			}
         }
     }
     post {

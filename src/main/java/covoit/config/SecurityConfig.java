@@ -18,6 +18,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import ch.qos.logback.core.Context;
 import covoit.entities.UserAccount;
+import covoit.exception.AnomalieException;
 import covoit.repository.UserAccountRepository;
 
 @Configuration

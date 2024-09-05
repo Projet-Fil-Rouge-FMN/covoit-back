@@ -2,23 +2,18 @@ package covoit.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import ch.qos.logback.core.Context;
 import covoit.entities.UserAccount;
-import covoit.exception.AnomalieException;
 import covoit.repository.UserAccountRepository;
 
 @Configuration
@@ -33,11 +28,9 @@ public class SecurityConfig implements WebMvcConfigurer {
 				.httpBasic(Customizer.withDefaults())
 				.securityContext((context -> context.securityContextRepository(repo)));
 		// Configurer CSRF avec CookieCsrfTokenRepository et HttpOnly désactivé
-        http.csrf(csrf -> csrf
-            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
+		http.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
 
-
-		//http.csrf(csrf -> csrf.disable());
+		// http.csrf(csrf -> csrf.disable());
 		return http.build();
 	}
 
@@ -68,7 +61,7 @@ public class SecurityConfig implements WebMvcConfigurer {
 		return username -> {
 			UserAccount userAccount = userAccountRepository.findByUserName(username);
 			if (userAccount == null) {
-				throw new AnomalieException("Wrong user or password");
+				throw new BadCredentialsException("Wrong user or password");
 			}
 			return userAccount.asUserDetails(); // Assuming `asUserDetails()` converts `UserAccount` to `UserDetails`
 		};

@@ -2,13 +2,15 @@ pipeline {
     agent any
 
     tools {
+        jdk 'java'
         maven 'Maven 3.9.9'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/Projet-Fil-Rouge-FMN/covoit-back.git'
+                // Using branch specifier to ensure the correct branch is checked out.
+                git branch: 'develop', url: 'https://github.com/Projet-Fil-Rouge-FMN/covoit-back.git'
             }
         }
 

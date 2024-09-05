@@ -34,7 +34,7 @@ public class SecurityConfig implements WebMvcConfigurer {
 				.securityContext((context -> context.securityContextRepository(repo)));
 		// Configurer CSRF avec CookieCsrfTokenRepository et HttpOnly désactivé
         http.csrf(csrf -> csrf
-            .csrfTokenRepository(CookieCsrfTokenRepository));
+            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
 
 
 		//http.csrf(csrf -> csrf.disable());
@@ -66,12 +66,9 @@ public class SecurityConfig implements WebMvcConfigurer {
 	@Bean
 	public UserDetailsService userDetailsService(UserAccountRepository userAccountRepository) {
 		return username -> {
-			try{
 			UserAccount userAccount = userAccountRepository.findByUserName(username);
-			}catch(UsernameNotFoundException){
-			}
 			if (userAccount == null) {
-				throw new UsernameNotFoundException("Username or password incorect");
+				throw new UsernameNotFoundException("Wrong Username or Password");
 			}
 			return userAccount.asUserDetails(); // Assuming `asUserDetails()` converts `UserAccount` to `UserDetails`
 		};

@@ -8,8 +8,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Using branch specifier to ensure the correct branch is checked out.
-                git branch: 'main', url: 'https://github.com/Projet-Fil-Rouge-FMN/covoit-back.git'
+                git url: 'https://github.com/Projet-Fil-Rouge-FMN/covoit-back.git'
             }
         }
 

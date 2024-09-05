@@ -7,7 +7,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
@@ -68,7 +67,7 @@ public class SecurityConfig implements WebMvcConfigurer {
 		return username -> {
 			UserAccount userAccount = userAccountRepository.findByUserName(username);
 			if (userAccount == null) {
-				throw new UsernameNotFoundException("Wrong user or password");
+				throw new AnomalieException("Wrong user or password");
 			}
 			return userAccount.asUserDetails(); // Assuming `asUserDetails()` converts `UserAccount` to `UserDetails`
 		};

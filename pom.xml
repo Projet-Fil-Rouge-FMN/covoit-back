@@ -109,7 +109,20 @@
             <scope>test</scope>
         </dependency>
 	</dependencies>
-
+<profiles>
+	<profile>
+		<id>dev</id>
+		<activation>
+			<activeByDefault>true</activeByDefault>
+		</activation>
+		<properties>
+			<appName>Carpool</appName>
+			<userName>root</userName>
+			<password>root</password>
+			<url>jdbc:h2:file:./covoitDb</url>
+		</properties>
+	</profile>
+</profiles>
 	<build>
 		<plugins>
 			<plugin>

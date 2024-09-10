@@ -22,15 +22,15 @@ public class SecurityConfig implements WebMvcConfigurer {
 	public SecurityFilterChain apiSecurity(HttpSecurity http) throws Exception {
 		HttpSessionSecurityContextRepository repo = new HttpSessionSecurityContextRepository();
 		http.authorizeHttpRequests(
-				(request) -> request.requestMatchers("/user/", "/user/register", "auth/login", "/**", "/swagger-ui/")
+				(request) -> request.requestMatchers("/user/", "/user/register", "auth/**", "/**", "/swagger-ui/")
 						.permitAll().requestMatchers("/user/{id}").hasRole("USER")
 						.requestMatchers("/**", "/user/delete/**").hasRole("ADMIN").anyRequest().authenticated())
 				.httpBasic(Customizer.withDefaults())
 				.securityContext((context -> context.securityContextRepository(repo)));
 		// Configurer CSRF avec CookieCsrfTokenRepository et HttpOnly désactivé
-		http.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
+		//http.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
 
-		// http.csrf(csrf -> csrf.disable());
+		http.csrf(csrf -> csrf.disable());
 		return http.build();
 	}
 

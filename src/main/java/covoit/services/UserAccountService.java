@@ -1,17 +1,22 @@
 
 package covoit.services;
 
-import java.util.ArrayList;
-import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.ArrayList;
+import java.util.List;import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import covoit.dtos.LoginRequestDto;
 import covoit.dtos.UserAccountDto;
 import covoit.entities.UserAccount;
 import covoit.exception.AnomalieException;
 import covoit.repository.UserAccountRepository;
+import io.jsonwebtoken.security.JwkSetBuilder;
 
 /**
  * Service interface for managing user accounts.
@@ -100,22 +105,24 @@ public class UserAccountService {
 
 
 
-    public UserAccount login(String username, String rawPassword) throws AnomalieException {
-        // Rechercher l'utilisateur
-        UserAccount user = repository.findByUserName(username);
-        
-        // Vérifier si l'utilisateur existe
-        if (user == null) {
-            throw new AnomalieException("Nom d'utilisateur ou mot de passe incorrect");
-        }
+	public UserAccount authenticate(String username, String rawPassword) throws AnomalieException {
+	    // Rechercher l'utilisateur
+	    UserAccount user = repository.findByUserName(username);
 
-        // Vérifier le mot de passe
-        if (bCryptPasswordEncoder.matches(rawPassword, user.getPassword())) {
-            return user; // Authentification réussie
-        } else {
-            throw new AnomalieException("Nom d'utilisateur ou mot de passe incorrect");
-        }
-    }
-    }
+	    // Vérifier si l'utilisateur existe
+	    if (user == null) {
+	        throw new AnomalieException("Nom d'utilisateur ou mot de passe incorrect");
+	    }
+
+	    // Vérifier le mot de passe
+	    if (bCryptPasswordEncoder.matches(rawPassword, user.getPassword())) {
+	        return user; // Authentification réussie
+	    } else {
+	        throw new AnomalieException("Nom d'utilisateur ou mot de passe incorrect");
+	    }
+	}
+
+
+}
 
 

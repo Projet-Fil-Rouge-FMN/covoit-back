@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>covoit-back</groupId>
 	<artifactId>covoit-back</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.3-SNAPSHOT</version>
 	<name>convoitBack</name>
 	<description>convoitback</description>
 	

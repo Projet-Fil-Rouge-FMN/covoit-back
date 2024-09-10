@@ -31,9 +31,6 @@ public class AuthController {
         this.userAccountService = authService; 
         this.jwtService = jwtService;
     }
-    public AuthController(UserAccountService userAccountService) {
-        this.userAccountService = userAccountService;
-    }
 
 
     @PostMapping("/login")
@@ -43,14 +40,13 @@ public class AuthController {
             UserAccount user = userAccountService.authenticate(loginRequestDto.getUsername(), loginRequestDto.getPassword());
 
             // Générer le token
-            String token = jwtService.generateToken(user.asUserDetails());
+            String token = jwtService.generateToken(user.getUserName());
 
             // Retourner la réponse avec le token
             return ResponseEntity.ok()
                                  .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                                  .body(new LoginResponse("Login successful"));
         } catch (AnomalieException e) {
-            // Retourner une erreur 401 Unauthorized si l'authentification échoue
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                                  .body(new LoginResponse(e.getMessage()));
         }

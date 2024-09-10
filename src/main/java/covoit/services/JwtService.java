@@ -1,10 +1,9 @@
 package covoit.services;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-
-import org.springframework.security.core.userdetails.UserDetails;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.auth0.jwt.interfaces.JWTVerifier;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -12,36 +11,25 @@ import java.util.Date;
 @Service
 public class JwtService {
 
-    private final String secretKey = "votre_clé_secrète"; // Remplacez par une clé secrète appropriée
-    private final long expirationMillis = 86400000; // 1 jour
+    private final String SECRET_KEY = "your_secret_key";  // Remplace par ta clé secrète
 
-    // Générer un token JWT
-    public String generateToken(UserDetails userDetails) {
-        return Jwts.builder()
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expirationMillis))
-                .signWith(SignatureAlgorithm.HS256, secretKey)
-                .compact();
+    public String generateToken(String username) {
+        Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY);
+
+        return JWT.create()
+                .withSubject(username)
+                .withIssuedAt(new Date())
+                .withExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 heures
+                .sign(algorithm);
     }
 
-    // Extraire les informations du token
-    public Claims extractClaims(String token) {
-        return ((UserAccountService) Jwts.parser()
-                .setSigningKey(secretKey))
-                .parseClaimsJws(token)
-                .getBody();
+    public DecodedJWT verifyToken(String token) {
+        Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY);
+        JWTVerifier verifier = JWT.require(algorithm).build();
+        return verifier.verify(token);
     }
 
-    // Vérifier si le token est expiré
-    public boolean isTokenExpired(String token) {
-        Date expiration = extractClaims(token).getExpiration();
-        return expiration.before(new Date());
-    }
-
-    // Valider le token
-    public boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractClaims(token).getSubject();
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    public String getUsernameFromToken(String token) {
+        return verifyToken(token).getSubject();
     }
 }

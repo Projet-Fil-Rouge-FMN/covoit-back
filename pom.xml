@@ -116,6 +116,7 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
+				<env>src/main/resources/dev</env>
 				<appName>Carpool</appName>
 				<userName>root</userName>
 				<password>root</password>
@@ -125,6 +126,7 @@
 		<profile>
 			<id>prod</id>
 			<properties>
+				<env>src/main/resources/prod</env>
 				<appName>Carpool</appName>
 				<jdbc.url>
 					jdbc:mysql://${env.MYSQL_ADDON_HOST}:${env.MYSQL_ADDON_PORT}/${env.MYSQL_ADDON_DB}</jdbc.url>
@@ -132,6 +134,11 @@
 		</profile>
 	</profiles>
 	<build>
+		<resources>
+			<resource>
+				<directory>${env}</directory>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

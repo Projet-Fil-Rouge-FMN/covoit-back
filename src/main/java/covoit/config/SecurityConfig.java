@@ -51,23 +51,24 @@ public class SecurityConfig implements WebMvcConfigurer {
 	            registry.addMapping("/**")
 	                    .allowedOrigins("http://localhost:4200")
 	                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+	                    .allowCredentials(true)
 	                    .allowedHeaders("*")
-	                    .allowCredentials(true);
+	                    .allowedHeaders("Authotization");
 	        }
 	    };
 	}
-	 @Bean
-	    public CorsFilter corsFilter() {
-	        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-	        CorsConfiguration config = new CorsConfiguration();
-	        config.setAllowCredentials(true);
-	        config.addAllowedOrigin("*");
-	        config.addAllowedHeader("*");
-	        config.addAllowedMethod("*");
-	        source.registerCorsConfiguration("/**", config);
-	        return new CorsFilter(source);
-	    }
-	
+//	 @Bean
+//	    public CorsFilter corsFilter() {
+//	        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//	        CorsConfiguration config = new CorsConfiguration();
+//	        config.setAllowCredentials(true);
+//	        config.addAllowedOrigin("*");
+//	        config.addAllowedHeader("*");
+//	        config.addAllowedMethod("*");
+//	        source.registerCorsConfiguration("/**", config);
+//	        return new CorsFilter(source);
+//	    }
+//	
 	// Creation UserDetail temporaire
 //	@Bean
 //	public InMemoryUserDetailsManager userDetailsService() {

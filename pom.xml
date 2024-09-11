@@ -116,7 +116,7 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
-				<jdbc.name>Carpool</jdbc.name>
+				<jdbc.name>covoit</jdbc.name>
 				<jdbc.userName>root</jdbc.userName>
 				<jdbc.password>root</jdbc.password>
 				<jdbc.url>jdbc:h2:file:./covoitDb</jdbc.url>
@@ -127,11 +127,10 @@
 			<id>prod</id>
 			<properties>
 				<jdbc.name>Carpool</jdbc.name>
-				<jdbc.userName>${MYSQL_ADDON_USER}</jdbc.userName>
-				<jdbc.password>${MYSQL_ADDON_PASSWORD}</jdbc.password>
-				<jdbc.port>${MYSQL_ADDON_PORT}</jdbc.port>
-				<jdbc.url>
-					jdbc:h2:file:./covoitDb</jdbc.url>
+				<jdbc.userName>root</jdbc.userName>
+				<jdbc.password>root</jdbc.password>
+				<jdbc.port>8080</jdbc.port>
+				<jdbc.url>jdbc:h2:file:./covoitDb</jdbc.url>
 			</properties>
 		</profile>
 	</profiles>

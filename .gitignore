@@ -8,3 +8,4 @@
 mylog.log
 application.properties
 .metadata/.log
+.covoitDb.mv.db

@@ -116,29 +116,26 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
-				<env>src/main/resources/dev</env>
-				<appName>Carpool</appName>
-				<userName>root</userName>
-				<password>root</password>
-				<url>jdbc:h2:file:./covoitDb</url>
+				<jdbc.name>Carpool</jdbc.name>
+				<jdbc.userName>root</jdbc.userName>
+				<jdbc.password>root</jdbc.password>
+				<jdbc.url>jdbc:h2:file:./covoitDb</jdbc.url>
+				<jdbc.port>8081</jdbc.port>
 			</properties>
 		</profile>
 		<profile>
 			<id>prod</id>
 			<properties>
-				<env>src/main/resources/prod</env>
-				<appName>Carpool</appName>
+				<jdbc.name>Carpool</jdbc.name>
+				<jdbc.userName>${MYSQL_ADDON_USER}</jdbc.userName>
+				<jdbc.password>${MYSQL_ADDON_PASSWORD}</jdbc.password>
+				<jdbc.port>${MYSQL_ADDON_PORT}</jdbc.port>
 				<jdbc.url>
 					jdbc:mysql://${env.MYSQL_ADDON_HOST}:${env.MYSQL_ADDON_PORT}/${env.MYSQL_ADDON_DB}</jdbc.url>
 			</properties>
 		</profile>
 	</profiles>
 	<build>
-		<resources>
-			<resource>
-				<directory>${env}</directory>
-			</resource>
-		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

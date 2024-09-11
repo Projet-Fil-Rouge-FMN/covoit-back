@@ -108,6 +108,24 @@
 			<version>5.14.0.18788</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- Pour résoudre les dépendances de JWT -->
+		<dependency>
+			<groupId>org.javers</groupId>
+			<artifactId>javers-core</artifactId>
+			<version>6.13.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jacoco</groupId>
+			<artifactId>org.jacoco.agent</artifactId>
+			<version>0.8.12</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.auth0</groupId>
+			<artifactId>java-jwt</artifactId>
+			<version>4.4.0</version>
+		</dependency>
 	</dependencies>
 	<profiles>
 		<profile>
@@ -123,16 +141,16 @@
 				<jdbc.port>8081</jdbc.port>
 			</properties>
 		</profile>
-		<profile>
-			<id>prod</id>
-			<properties>
-				<jdbc.name>Carpool</jdbc.name>
-				<jdbc.userName>root</jdbc.userName>
-				<jdbc.password>root</jdbc.password>
-				<jdbc.port>8080</jdbc.port>
-				<jdbc.url>jdbc:h2:file:./covoitDb</jdbc.url>
-			</properties>
-		</profile>
+<!--		<profile>-->
+<!--			<id>prod</id>-->
+<!--			<properties>-->
+<!--				<jdbc.name>Carpool</jdbc.name>-->
+<!--				<jdbc.userName>root</jdbc.userName>-->
+<!--				<jdbc.password>root</jdbc.password>-->
+<!--				<jdbc.port>8080</jdbc.port>-->
+<!--				<jdbc.url>jdbc:h2:file:./covoitDb</jdbc.url>-->
+<!--			</properties>-->
+<!--		</profile>-->
 	</profiles>
 	<build>
 		<plugins>

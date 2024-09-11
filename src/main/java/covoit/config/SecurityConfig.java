@@ -1,50 +1,65 @@
 package covoit.config;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import covoit.entities.UserAccount;
 import covoit.repository.UserAccountRepository;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig implements WebMvcConfigurer {
 	@Bean
 	public SecurityFilterChain apiSecurity(HttpSecurity http) throws Exception {
-		HttpSessionSecurityContextRepository repo = new HttpSessionSecurityContextRepository();
-		http.authorizeHttpRequests(
-				(request) -> request.requestMatchers("/user/", "/user/register", "auth/login", "/**", "/swagger-ui/")
-						.permitAll().requestMatchers("/user/{id}").hasRole("USER")
-						.requestMatchers("/**", "/user/delete/**").hasRole("ADMIN").anyRequest().authenticated())
-				.httpBasic(Customizer.withDefaults())
-				.securityContext((context -> context.securityContextRepository(repo)));
-		// Configurer CSRF avec CookieCsrfTokenRepository et HttpOnly désactivé
-		http.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
+	    HttpSessionSecurityContextRepository repo = new HttpSessionSecurityContextRepository();
+	    
+	    http
+	        .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Application de la configuration CORS
+	        .authorizeHttpRequests(authorize -> authorize
+	            .requestMatchers("/user/", "/user/register", "auth/**", "/**", "/swagger-ui/")
+	            .permitAll()
+	            .requestMatchers("/user/{id}")
+	            .hasRole("USER")
+	            .requestMatchers("/**", "/user/delete/**")
+	            .hasRole("ADMIN")
+	            .anyRequest().authenticated())
+	        .httpBasic(Customizer.withDefaults())
+	        .securityContext((context -> context.securityContextRepository(repo)))
+	        .csrf(csrf -> csrf.disable());
 
-		// http.csrf(csrf -> csrf.disable());
-		return http.build();
+	    return http.build();
 	}
 
 	@Bean
-	public WebMvcConfigurer corsConfigurer() {
-		return new WebMvcConfigurer() {
-			@Override
-			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**").allowedOrigins("http://localhost:4200")
-						.allowedMethods("GET", "POST", "PUT", "DELETE").allowedHeaders("*");
-				// .allowCredentials(true);
-			}
-		};
+	public CorsConfigurationSource corsConfigurationSource() {
+	    CorsConfiguration configuration = new CorsConfiguration();
+	    configuration.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
+	    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+	    configuration.setAllowedHeaders(Arrays.asList("*"));
+	    configuration.setAllowCredentials(true);
+	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+	    source.registerCorsConfiguration("/**", configuration);
+	    return source;
 	}
+
+
+
+//	
 	// Creation UserDetail temporaire
 //	@Bean
 //	public InMemoryUserDetailsManager userDetailsService() {

@@ -11,6 +11,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -22,32 +25,49 @@ import covoit.repository.UserAccountRepository;
 public class SecurityConfig implements WebMvcConfigurer {
 	@Bean
 	public SecurityFilterChain apiSecurity(HttpSecurity http) throws Exception {
-		HttpSessionSecurityContextRepository repo = new HttpSessionSecurityContextRepository();
-		http.authorizeHttpRequests(
-				(request) -> request.requestMatchers("/user/", "/user/register", "auth/**", "/**", "/swagger-ui/")
-						.permitAll().requestMatchers("/user/{id}").hasRole("USER")
-						.requestMatchers("/**", "/user/delete/**").hasRole("ADMIN").anyRequest().authenticated())
-				.httpBasic(Customizer.withDefaults())
-				.securityContext((context -> context.securityContextRepository(repo)));
-		// Configurer CSRF avec CookieCsrfTokenRepository et HttpOnly désactivé
-		//http.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
+	    HttpSessionSecurityContextRepository repo = new HttpSessionSecurityContextRepository();
+	    http.authorizeHttpRequests(authorize -> authorize
+	        .requestMatchers("/user/", "/user/register", "auth/**", "/**", "/swagger-ui/")
+	        .permitAll()
+	        .requestMatchers("/user/{id}")
+	        .hasRole("USER")
+	        .requestMatchers("/**", "/user/delete/**")
+	        .hasRole("ADMIN")
+	        .anyRequest().authenticated())
+	    .httpBasic(Customizer.withDefaults())
+	    .securityContext((context -> context.securityContextRepository(repo)))
+	    .csrf(csrf -> csrf.disable());
 
-		http.csrf(csrf -> csrf.disable());
-		return http.build();
+	    //http.options("/**").permitAll();
+
+	    return http.build();
 	}
 
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {
-		
-		return new WebMvcConfigurer() {
-			@Override
-			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**").allowedOrigins("http://localhost:4200")
-						.allowedMethods("GET", "POST", "PUT", "DELETE").allowedHeaders("*");
-				// .allowCredentials(true);
-			}
-		};
+	    return new WebMvcConfigurer() {
+	        @Override
+	        public void addCorsMappings(CorsRegistry registry) {
+	            registry.addMapping("/**")
+	                    .allowedOrigins("http://localhost:4200")
+	                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+	                    .allowedHeaders("*")
+	                    .allowCredentials(true);
+	        }
+	    };
 	}
+	 @Bean
+	    public CorsFilter corsFilter() {
+	        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+	        CorsConfiguration config = new CorsConfiguration();
+	        config.setAllowCredentials(true);
+	        config.addAllowedOrigin("*");
+	        config.addAllowedHeader("*");
+	        config.addAllowedMethod("*");
+	        source.registerCorsConfiguration("/**", config);
+	        return new CorsFilter(source);
+	    }
+	
 	// Creation UserDetail temporaire
 //	@Bean
 //	public InMemoryUserDetailsManager userDetailsService() {

@@ -116,7 +116,7 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
-				<jdbc.name>Carpool</jdbc.name>
+				<jdbc.name>covoit</jdbc.name>
 				<jdbc.userName>root</jdbc.userName>
 				<jdbc.password>root</jdbc.password>
 				<jdbc.url>jdbc:h2:file:./covoitDb</jdbc.url>

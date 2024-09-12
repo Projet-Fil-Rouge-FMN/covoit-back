@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -28,7 +29,7 @@ public class SecurityConfig implements WebMvcConfigurer {
 	@Bean
 	public SecurityFilterChain apiSecurity(HttpSecurity http) throws Exception {
 	    HttpSessionSecurityContextRepository repo = new HttpSessionSecurityContextRepository();
-	    
+
 	    http
 	        .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Application de la configuration CORS
 	        .authorizeHttpRequests(authorize -> authorize
@@ -41,10 +42,17 @@ public class SecurityConfig implements WebMvcConfigurer {
 	            .anyRequest().authenticated())
 	        .httpBasic(Customizer.withDefaults())
 	        .securityContext((context -> context.securityContextRepository(repo)))
-	        .csrf(csrf -> csrf.disable());
+	        .csrf(csrf -> csrf.disable())
+	        .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
 	    return http.build();
 	}
+
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter();
+    }
 
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {

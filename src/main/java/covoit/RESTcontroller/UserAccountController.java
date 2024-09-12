@@ -3,7 +3,12 @@ package covoit.RESTcontroller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,7 +26,7 @@ import covoit.entities.UserAccount;
 import covoit.exception.AnomalieException;
 import covoit.services.UserAccountService;
 
-@CrossOrigin("http://localhost:4200")
+
 @RestController
 @RequestMapping(value = "/user", produces = "application/json")
 public class UserAccountController {
@@ -30,12 +35,14 @@ public class UserAccountController {
     private UserAccountService userAccountService;
  
     @GetMapping("/")
-    public List< UserAccountDto> findAll(){
-    	return userAccountService.findAll();
+    public ResponseEntity<List<UserAccountDto>> findAll() {
+        List<UserAccountDto> users = userAccountService.findAll();
+        return ResponseEntity.ok(users);
     }
     @GetMapping("/{id}")
-    public UserAccountDto findById(@PathVariable int id) {
-        return userAccountService.findById(id);
+    public ResponseEntity<UserAccountDto> findById(@PathVariable int id) {
+        UserAccountDto user = userAccountService.findById(id);
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping("/register")
@@ -53,11 +60,15 @@ public class UserAccountController {
     }
     
 
-    @DeleteMapping("/delete/{id}")
-    public void delete(@PathVariable int id) {
-        userAccountService.delete(id);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable int id) {
+        boolean deleted = userAccountService.deleteUserById(id);
+        if (deleted) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
-
  
     @DeleteMapping("/{userId}/cancel-carpool")
     public void cancelCarpool(@PathVariable int userId, @RequestParam int carpoolId) {

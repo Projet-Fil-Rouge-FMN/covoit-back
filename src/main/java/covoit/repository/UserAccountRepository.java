@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
 import covoit.dtos.UserAccountDto;
@@ -24,7 +25,8 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, Intege
 
 	UserAccount findById(int id);
 	UserAccount findByEmail(String email);
-	UserAccount findByUserName(String userName);
+	UserAccount findByUserName(String username);
+	@NonNull
 	List<UserAccount> findAll();
 
 	void save(UserAccountDto userDB);

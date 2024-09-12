@@ -4,6 +4,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import covoit.dtos.UserAccountDto;
+import covoit.repository.UserAccountRepository;
+import covoit.services.UserAccountService;
+
 import java.util.Collection;
 import java.util.Collections;
 
@@ -50,4 +54,11 @@ public class CustomUserDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+	public int getId() {
+		// TODO Auto-generated method stub
+		return user.getId();
+	}
+
+
 }

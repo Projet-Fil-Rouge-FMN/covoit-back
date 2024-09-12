@@ -141,16 +141,16 @@
 				<jdbc.port>8081</jdbc.port>
 			</properties>
 		</profile>
-<!--		<profile>-->
-<!--			<id>prod</id>-->
-<!--			<properties>-->
-<!--				<jdbc.name>Carpool</jdbc.name>-->
-<!--				<jdbc.userName>root</jdbc.userName>-->
-<!--				<jdbc.password>root</jdbc.password>-->
-<!--				<jdbc.port>8080</jdbc.port>-->
-<!--				<jdbc.url>jdbc:h2:file:./covoitDb</jdbc.url>-->
-<!--			</properties>-->
-<!--		</profile>-->
+		<profile>
+			<id>prod</id>
+			<properties>
+				<jdbc.name>Carpool</jdbc.name>
+				<jdbc.userName>root</jdbc.userName>
+				<jdbc.password>root</jdbc.password>
+				<jdbc.port>8080</jdbc.port>
+				<jdbc.url>jdbc:h2:file:./covoitDb</jdbc.url>
+			</properties>
+		</profile>
 	</profiles>
 	<build>
 		<plugins>

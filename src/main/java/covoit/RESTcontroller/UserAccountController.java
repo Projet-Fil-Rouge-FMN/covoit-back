@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,12 +31,17 @@ public class UserAccountController {
     private UserAccountService userAccountService;
  
     @GetMapping("/")
-    public List< UserAccountDto> findAll(){
-    	return userAccountService.findAll();
+    public ResponseEntity<List<UserAccountDto>> findAll() {
+        List<UserAccountDto> users = userAccountService.findAll();
+        return ResponseEntity.ok(users);
     }
     @GetMapping("/{id}")
-    public UserAccountDto findById(@PathVariable int id) {
-        return userAccountService.findById(id);
+    public ResponseEntity<UserAccountDto> findById(@PathVariable int id) {
+        UserAccountDto user = userAccountService.findById(id);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping("/register")

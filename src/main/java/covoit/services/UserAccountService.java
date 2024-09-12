@@ -27,11 +27,7 @@ public class UserAccountService {
 
 	public List<UserAccountDto> findAll() {
 		List<UserAccount> users = new ArrayList<>();
-		if(repository.findAll() != null) {
-			users = repository.findAll();
-		}else {
-			System.out.println("Rien trouver");
-		}
+		users = repository.findAll();
 		List<UserAccountDto> usersDto = new ArrayList<>();
 		for (UserAccount item : users) {
 			usersDto.add(new UserAccountDto().toDto(item));

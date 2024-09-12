@@ -49,9 +49,7 @@ public class UserAccount {
         this.driverLicence = driverLicence;
     }
     public UserAccount() {}
-    public UserDetails asUserDetails() {
-        return new User(userName, password, authorities);
-    }
+
 
 
     public void addAuthorities(String role) {
@@ -137,6 +135,16 @@ public class UserAccount {
 	public void setEmail(String email) {
 		this.email = email;
 	}
+	public UserDetails asUserDetails() {
+	    return User.builder()
+	        .username(this.userName)
+	        .password(this.password)
+	        .roles(this.authorities.stream()
+	            .map(auth -> auth.getAuthority())
+	            .toArray(String[]::new))
+	        .build();
+	}
+
 	@Override
 	public String toString() {
 		return "UserAccount [id=" + id + ", userName=" + userName + ", lastName=" + lastName + ", password=" + password

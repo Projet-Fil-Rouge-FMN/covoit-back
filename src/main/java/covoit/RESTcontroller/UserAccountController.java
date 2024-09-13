@@ -20,7 +20,7 @@ import covoit.dtos.UserAccountDto;
 import covoit.entities.UserAccount;
 import covoit.services.UserAccountService;
 
-@CrossOrigin("http://localhost:4200")
+
 @RestController
 @RequestMapping(value = "/user", produces = "application/json")
 public class UserAccountController {

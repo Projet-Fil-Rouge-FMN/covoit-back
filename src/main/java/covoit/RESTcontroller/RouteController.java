@@ -34,7 +34,7 @@ public class RouteController {
 	 * Get all routes
 	 * 
 	 */
-	@GetMapping("/")
+	@GetMapping
 	public Iterable<RouteDto> findAll() {
 		return service.findAll();
 	}

@@ -5,11 +5,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,10 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import covoit.dtos.UserAccountDto;
-import covoit.entities.CustomUserDetails;
 import covoit.entities.UserAccount;
-import covoit.exception.AnomalieException;
-import covoit.repository.UserAccountRepository;
 import covoit.services.UserAccountService;
 
 @CrossOrigin("http://localhost:4200")
@@ -36,9 +28,8 @@ public class UserAccountController {
     @Autowired
     private UserAccountService userAccountService;
  
-    @Autowired
-    private UserAccountRepository accountRepository;
-    @GetMapping()
+
+    @GetMapping
     public ResponseEntity<List<UserAccountDto>> findAll() {
         List<UserAccountDto> users = userAccountService.findAll();
         return ResponseEntity.ok(users);

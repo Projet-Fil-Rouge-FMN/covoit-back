@@ -36,7 +36,7 @@ public class VehicleModelController {
 	 * Get all vehicle models
 	 * 
 	 */
-	@GetMapping("/")
+	@GetMapping
 	public List<VehicleModelDto> findAll() {
 		return service.findAll();
 	}

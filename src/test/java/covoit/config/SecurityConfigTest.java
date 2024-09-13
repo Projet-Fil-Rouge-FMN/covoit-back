@@ -95,19 +95,18 @@ class SecurityConfigTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.userName").value("user"));
     }
-        @Test
-        @WithMockUser(username = "admin", roles = {"ADMIN"})
-        void testDeleteUserById() throws Exception {
-            int userId = 1;
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void testDeleteUserById() throws Exception {
+        int userId = 1;
 
-            // Mock du comportement du service
-            when(userAccountService.deleteUserById(userId)).thenReturn(true);
+        // Mock du comportement du service
+        when(userAccountService.deleteUserById(userId)).thenReturn(true);
 
-            // Exécution de la requête de suppression
-            mockMvc.perform(delete("/user/" + userId))
-                   .andExpect(status().isOk());
-        }
-
+        // Exécution de la requête de suppression
+        mockMvc.perform(MockMvcRequestBuilders.delete("/user/" + userId))
+               .andExpect(MockMvcResultMatchers.status().isNoContent()); // Utiliser isNoContent() pour le statut 204
+    }
 
 
       
@@ -133,7 +132,7 @@ class SecurityConfigTest {
 
     @Test
     void testFindAllUsers() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/user/")
+        mockMvc.perform(MockMvcRequestBuilders.get("/user")
                .accept(MediaType.APPLICATION_JSON))
                .andExpect(MockMvcResultMatchers.status().isOk())
                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON));

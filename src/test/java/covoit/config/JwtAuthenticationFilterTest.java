@@ -1,34 +1,19 @@
 package covoit.config;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.HashMap;
-
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.mock;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import com.auth0.jwt.interfaces.Claim;
-import com.auth0.jwt.interfaces.DecodedJWT;
-
-import covoit.RESTcontroller.UserAccountController;
 import covoit.dtos.UserAccountDto;
-import covoit.entities.UserAccount;
 import covoit.repository.UserAccountRepository;
 import covoit.services.JwtService;
 import covoit.services.UserAccountService;
@@ -47,19 +32,26 @@ class JwtAuthenticationFilterTest {
     private UserAccountRepository userAccountRepository; // Mock du repository
     @MockBean
     private UserAccountService userAccountService;
+    
     @Test
-    public void testJwtFilter_ValidToken() throws Exception {
-        String token = "valid_token";
-        DecodedJWT decodedJWT = Mockito.mock(DecodedJWT.class);
-        
-        // Configurez les méthodes du mock DecodedJWT
-        Mockito.when(decodedJWT.getClaims()).thenReturn(new HashMap<>()); // Exemple, ajustez selon vos besoins
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void testFindUserById() throws Exception {
+        int userId = 1;
 
-        Mockito.when(jwtService.verifyToken(token)).thenReturn(decodedJWT);
-        Mockito.when(jwtService.getUsernameFromToken(token)).thenReturn("user");
-        Mockito.when(jwtService.getRolesFromToken(token)).thenReturn(new String[]{"USER"});
+        // Créez un UserAccountDto avec des données appropriées
+        UserAccountDto userDto = new UserAccountDto();
+        userDto.setId(userId); // Assurez-vous que tous les champs nécessaires sont définis
+        userDto.setUserName("testuser");
 
-        mockMvc.perform(get("/user/1").header("Authorization", "Bearer " + token))
-               .andExpect(status().isOk());
+        // Mock du comportement du service
+        when(userAccountService.findById(userId)).thenReturn(userDto);
+
+        // Exécution de la requête GET
+        mockMvc.perform(MockMvcRequestBuilders.get("/user/" + userId)
+               .accept(MediaType.APPLICATION_JSON))
+               .andExpect(MockMvcResultMatchers.status().isOk())
+               .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+               .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(userId)) // Vérifie les valeurs spécifiques
+               .andExpect(MockMvcResultMatchers.jsonPath("$.userName").value("testuser"));
     }
 }

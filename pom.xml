@@ -110,6 +110,13 @@
 			<version>0.8.12</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>5.10.2</version> <!-- Mettez à jour selon la version que vous
+			utilisez -->
+			<scope>test</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>com.auth0</groupId>
@@ -170,16 +177,16 @@
 						</goals>
 					</execution>
 				</executions>
-				
+
 			</plugin>
 			<plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-surefire-plugin</artifactId>
-    <version>3.5.0</version>
-    <configuration>
-        <argLine>-XX:+EnableDynamicAgentLoading</argLine>
-    </configuration>
-</plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.5.0</version>
+				<configuration>
+					<argLine>-XX:+EnableDynamicAgentLoading</argLine>
+				</configuration>
+			</plugin>
 
 		</plugins>
 	</build>

@@ -5,11 +5,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,10 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import covoit.dtos.UserAccountDto;
 import covoit.entities.UserAccount;
-import covoit.exception.AnomalieException;
 import covoit.services.UserAccountService;
 
-
+@CrossOrigin("http://localhost:4200")
 @RestController
 @RequestMapping(value = "/user", produces = "application/json")
 public class UserAccountController {
@@ -34,17 +28,20 @@ public class UserAccountController {
     @Autowired
     private UserAccountService userAccountService;
  
+
     @GetMapping
     public ResponseEntity<List<UserAccountDto>> findAll() {
         List<UserAccountDto> users = userAccountService.findAll();
         return ResponseEntity.ok(users);
     }
     @GetMapping("/{id}")
-    public ResponseEntity<UserAccountDto> findById(@PathVariable int id) {
+    public ResponseEntity<UserAccountDto> findUserById(@PathVariable int id) {
         UserAccountDto user = userAccountService.findById(id);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(user);
     }
-
     @PostMapping("/register")
     public ResponseEntity<String> create(@RequestBody UserAccountDto userAccountDto) {
         // Convertir UserAccountDto en UserAccount	
@@ -61,12 +58,19 @@ public class UserAccountController {
     
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable int id) {
-        boolean deleted = userAccountService.deleteUserById(id);
-        if (deleted) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<?> deleteUser(@PathVariable int id) {
+        try {
+            boolean isDeleted = userAccountService.deleteUserById(id);
+            if (isDeleted) {
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            // Log the exception and return a server error response
+            // Optionally use a logging framework
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred");
         }
     }
  

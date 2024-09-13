@@ -11,6 +11,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotNull;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -37,16 +38,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * @throws ServletException En cas d'erreur de servlet.
      */
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+    protected void doFilterInternal(@NotNull HttpServletRequest request,@NotNull HttpServletResponse response,@NotNull FilterChain chain)
             throws ServletException, IOException {
-        String token = getJwtFromRequest(request);
+        try {
+            String token = getJwtFromRequest(request);
 
-        if (token != null && jwtService.verifyToken(token) != null) {
-            String username = jwtService.getUsernameFromToken(token);
-            Collection<SimpleGrantedAuthority> authorities = getAuthoritiesFromToken(token);
+            if (token != null && jwtService.verifyToken(token) != null) {
+                String username = jwtService.getUsernameFromToken(token);
+                Collection<SimpleGrantedAuthority> authorities = getAuthoritiesFromToken(token);
 
-            Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+        } catch (Exception ex) {
+            SecurityContextHolder.clearContext();
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
         }
 
         chain.doFilter(request, response);

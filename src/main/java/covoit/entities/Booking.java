@@ -2,6 +2,8 @@ package covoit.entities;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,9 +24,11 @@ public class Booking {
 	protected int id;
 	protected LocalDateTime startDate;
 	protected LocalDateTime endDate;
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "ID_SERVICE_VEHICLE")
 	protected ServiceVehicle serviceVehicle;
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "ID_DRIVER")
 	protected UserAccount driver;

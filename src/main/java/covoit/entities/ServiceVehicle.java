@@ -3,6 +3,8 @@ package covoit.entities;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -17,6 +19,7 @@ public class ServiceVehicle extends Vehicle{
 	protected String picture;
 	protected String motorization;
 	protected double co2Km;
+	@JsonIgnore
 	@OneToMany(mappedBy = "serviceVehicle")
 	private Set<Booking> bookings = new HashSet<>();
 	

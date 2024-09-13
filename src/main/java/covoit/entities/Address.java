@@ -2,6 +2,8 @@ package covoit.entities;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,6 +23,7 @@ public class Address {
 	protected String detail;
 	protected String city;
 	protected String country;
+	@JsonIgnore
 	@OneToMany(mappedBy = "startAddress")
 	private Set<Route> routes;
 	

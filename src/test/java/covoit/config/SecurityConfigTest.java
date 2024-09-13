@@ -95,6 +95,7 @@ class SecurityConfigTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.userName").value("user"));
     }
+    
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testDeleteUserById() throws Exception {
@@ -107,6 +108,23 @@ class SecurityConfigTest {
         mockMvc.perform(MockMvcRequestBuilders.delete("/user/" + userId))
                .andExpect(MockMvcResultMatchers.status().isNoContent()); // Utiliser isNoContent() pour le statut 204
     }
+    
+    @Test
+    @WithMockUser(username = "user", roles = {"USER"})
+    void testDeleteUserByIdFail() throws Exception {
+        int validUserId = 2; // ID attendu par le service
+        int incorrectUserId = 1; // ID incorrect pour la suppression
+
+        // Mock du comportement du service pour l'ID attendu
+        when(userAccountService.deleteUserById(validUserId)).thenReturn(true);
+        // Mock du comportement du service pour l'ID incorrect
+        when(userAccountService.deleteUserById(incorrectUserId)).thenReturn(false); // Simuler une échec
+
+        // Exécution de la requête de suppression avec l'ID incorrect
+        mockMvc.perform(MockMvcRequestBuilders.delete("/user/" + incorrectUserId))
+               .andExpect(MockMvcResultMatchers.status().isNotFound()); // Attendre un statut 404 ou autre erreur
+    }
+
 
 
       

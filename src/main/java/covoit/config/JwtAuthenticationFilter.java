@@ -2,6 +2,7 @@ package covoit.config;
 
 import covoit.services.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -38,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * @throws ServletException En cas d'erreur de servlet.
      */
     @Override
-    protected void doFilterInternal(@NotNull HttpServletRequest request,@NotNull HttpServletResponse response,@NotNull FilterChain chain)
+    protected void doFilterInternal( @NonNull HttpServletRequest request,@NonNull HttpServletResponse response,@NonNull FilterChain chain)
             throws ServletException, IOException {
         try {
             String token = getJwtFromRequest(request);

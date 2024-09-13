@@ -113,11 +113,15 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
-			<version>5.10.2</version> <!-- Mettez à jour selon la version que vous
-			utilisez -->
+			<version>5.10.2</version> 
 			<scope>test</scope>
 		</dependency>
-
+<dependency>
+    <groupId>org.junit.jupiter</groupId>
+    <artifactId>junit-jupiter-engine</artifactId>
+    <version>5.10.2</version> <!-- ou la version que tu utilises -->
+    <scope>test</scope>
+</dependency>
 		<dependency>
 			<groupId>com.auth0</groupId>
 			<artifactId>java-jwt</artifactId>

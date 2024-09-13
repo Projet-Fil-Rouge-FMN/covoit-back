@@ -59,20 +59,19 @@ public class UserAccountController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable int id) {
-        try {
-            boolean isDeleted = userAccountService.deleteUserById(id);
-            if (isDeleted) {
-                return ResponseEntity.noContent().build();
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            // Log the exception and return a server error response
-            // Optionally use a logging framework
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred");
-        }
-    }
+    	    try {
+    	        boolean deleted = userAccountService.deleteUserById(id);
+    	        if (deleted) {
+    	            return ResponseEntity.ok("User deleted successfully");
+    	        } else {
+    	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+    	        }
+    	    } catch (Exception e) {
+    	        // Log the exception details
+    	        e.printStackTrace();
+    	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete user");
+    	    }
+    	}
  
     @DeleteMapping("/{userId}/cancel-carpool")
     public void cancelCarpool(@PathVariable int userId, @RequestParam int carpoolId) {

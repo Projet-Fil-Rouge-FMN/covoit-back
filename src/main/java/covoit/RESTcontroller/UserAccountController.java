@@ -29,7 +29,7 @@ public class UserAccountController {
     @Autowired
     private UserAccountService userAccountService;
  
-    @GetMapping("/")
+    @GetMapping
     public List< UserAccountDto> findAll(){
     	return userAccountService.findAll();
     }

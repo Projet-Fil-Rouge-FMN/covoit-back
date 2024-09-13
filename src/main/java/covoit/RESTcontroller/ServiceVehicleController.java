@@ -32,7 +32,7 @@ public class ServiceVehicleController {
 	 * Get all addresses
 	 * 
 	 */
-	@GetMapping("/")
+	
 	public List<ServiceVehicleDto> getAll() {
 		return service.findAll();
 	}

@@ -31,7 +31,7 @@ public class CategoryController {
 	 * Get all addresses
 	 * 
 	 */
-	@GetMapping("/")
+	@GetMapping
 	public List<CategoryDto> getAll() {
 		return service.findAll();
 	}

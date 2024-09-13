@@ -3,6 +3,8 @@ package covoit.entities;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,6 +22,7 @@ public class Brand {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	protected int id;
 	protected String name;
+	@JsonIgnore
 	@OneToMany(mappedBy = "brand")
 	private Set<Vehicle> vehicles = new HashSet<>();
 	

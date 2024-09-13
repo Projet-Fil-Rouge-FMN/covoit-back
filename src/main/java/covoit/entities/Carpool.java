@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,13 +25,13 @@ public class Carpool {
 	private int id;
 	private int availableSeat;
 	private LocalDate startDate;
-
+	@JsonIgnore
 	@ManyToOne
 	private Vehicle vehicle;
-
+	@JsonIgnore
 	@ManyToOne
 	private Route route;
-
+	@JsonIgnore
 	@ManyToMany
 	@JoinTable(name = "useraccount_carpoll", joinColumns = @JoinColumn(name = "id_carpool"), inverseJoinColumns = @JoinColumn(name = "id_userAccount"))
 	private List<UserAccount> userAccounts = new ArrayList<>();

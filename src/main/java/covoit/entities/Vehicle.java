@@ -3,6 +3,8 @@ package covoit.entities;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,16 +29,20 @@ public class Vehicle {
 	protected int id;
 	protected String registration;
 	protected int nbSeat;
+	@JsonIgnore
 	@ManyToOne
-	@JoinColumn(name = "ID_BRAND") 
+	@JoinColumn(name = "ID_BRAND")
 	protected Brand brand;
-	@ManyToOne
+	@JsonIgnore
+@ManyToOne
 	@JoinColumn(name = "ID_MODEL")
 	protected VehicleModel model;
-	@ManyToOne
+	@JsonIgnore
+@ManyToOne
 	@JoinColumn(name = "ID_CATEGORY")
 	protected Category category;
-	@ManyToMany
+	@JsonIgnore
+@ManyToMany
 	@JoinTable(name="DRIVER_VEHICULE", joinColumns = { @JoinColumn(name = "id_vehicle") }, 
     inverseJoinColumns = { @JoinColumn(name = "id_driver") } )
 	private Set<UserAccount> drivers = new HashSet<>();

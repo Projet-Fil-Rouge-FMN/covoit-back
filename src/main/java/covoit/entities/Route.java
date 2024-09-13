@@ -1,5 +1,7 @@
 package covoit.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,9 +21,11 @@ public class Route {
 	protected int id;
 	protected double duration;
 	protected double kmTotal;
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "ID_START_ADDRESS")
 	protected Address startAddress;
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "ID_END_ADDRESS")
 	protected Address endAddress;

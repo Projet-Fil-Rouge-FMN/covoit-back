@@ -22,11 +22,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import covoit.dtos.UserAccountDto;
+import covoit.entities.CustomUserDetails;
 import covoit.entities.UserAccount;
 import covoit.exception.AnomalieException;
+import covoit.repository.UserAccountRepository;
 import covoit.services.UserAccountService;
 
-
+@CrossOrigin("http://localhost:4200")
 @RestController
 @RequestMapping(value = "/user", produces = "application/json")
 public class UserAccountController {
@@ -34,17 +36,21 @@ public class UserAccountController {
     @Autowired
     private UserAccountService userAccountService;
  
-    @GetMapping("/")
+    @Autowired
+    private UserAccountRepository accountRepository;
+    @GetMapping()
     public ResponseEntity<List<UserAccountDto>> findAll() {
         List<UserAccountDto> users = userAccountService.findAll();
         return ResponseEntity.ok(users);
     }
     @GetMapping("/{id}")
-    public ResponseEntity<UserAccountDto> findById(@PathVariable int id) {
+    public ResponseEntity<UserAccountDto> findUserById(@PathVariable int id) {
         UserAccountDto user = userAccountService.findById(id);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(user);
     }
-
     @PostMapping("/register")
     public ResponseEntity<String> create(@RequestBody UserAccountDto userAccountDto) {
         // Convertir UserAccountDto en UserAccount	
@@ -61,12 +67,19 @@ public class UserAccountController {
     
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable int id) {
-        boolean deleted = userAccountService.deleteUserById(id);
-        if (deleted) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<?> deleteUser(@PathVariable int id) {
+        try {
+            boolean isDeleted = userAccountService.deleteUserById(id);
+            if (isDeleted) {
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            // Log the exception and return a server error response
+            // Optionally use a logging framework
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred");
         }
     }
  

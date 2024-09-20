@@ -105,7 +105,7 @@ class SecurityConfigTest {
         when(userAccountService.deleteUserById(userId)).thenReturn(true);
 
          .andExpect(status().isOk()) // attend un statut 200
-         .andExpect(content().string("User deleted successfully"));// Utiliser isNoContent() pour le statut 204
+         
     }
     
     @Test

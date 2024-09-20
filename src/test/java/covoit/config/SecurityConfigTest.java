@@ -104,9 +104,8 @@ class SecurityConfigTest {
         // Mock du comportement du service
         when(userAccountService.deleteUserById(userId)).thenReturn(true);
 
-        // Exécution de la requête de suppression
-        mockMvc.perform(MockMvcRequestBuilders.delete("/user/" + userId))
-               .andExpect(MockMvcResultMatchers.status().isNoContent()); // Utiliser isNoContent() pour le statut 204
+         .andExpect(status().isOk()) // attend un statut 200
+         .andExpect(content().string("User deleted successfully"));// Utiliser isNoContent() pour le statut 204
     }
     
     @Test

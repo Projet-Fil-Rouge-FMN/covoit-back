@@ -4,10 +4,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,6 +26,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import covoit.entities.UserAccount;
 import covoit.repository.UserAccountRepository;
+import covoit.services.JwtService;
 
 @Configuration
 @EnableWebSecurity
@@ -48,10 +53,27 @@ public class SecurityConfig implements WebMvcConfigurer {
 	    return http.build();
 	}
 
+	  @Autowired
+	    private AuthenticationConfiguration authenticationConfiguration;
+	 @Value("${jwt.secret}")
+	    private String secretKey;
+    @Autowired
+    private JwtService jwtService;
+    
+    @Autowired
+    private UserDetailsService userDetailsService;
+
 
     @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter();
+    public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtService, userDetailsService);
+        filter.setAuthenticationManager(authenticationManager()); // Associe le AuthenticationManager au filtre
+        return filter;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager() throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
 	@Bean

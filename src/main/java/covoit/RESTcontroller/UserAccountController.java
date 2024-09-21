@@ -57,22 +57,12 @@ public class UserAccountController {
     }
     
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable int id) {
-    	    try {
-    	        boolean deleted = userAccountService.deleteUserById(id);
-    	        if (deleted) {
-    	            return ResponseEntity.ok("User deleted successfully");
-    	        } else {
-    	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-    	        }
-    	    } catch (Exception e) {
-    	        // Log the exception details
-    	        e.printStackTrace();
-    	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete user");
-    	    }
-    	}
- 
+    @DeleteMapping("/delete/{id}")
+    public void deleteUser(@PathVariable int id) {
+    	 userAccountService.deleteUserById(id);
+    }
+
+
     @DeleteMapping("/{userId}/cancel-carpool")
     public void cancelCarpool(@PathVariable int userId, @RequestParam int carpoolId) {
      //  userAccountService.deleteBookingCarpool(carpoolId, userId);

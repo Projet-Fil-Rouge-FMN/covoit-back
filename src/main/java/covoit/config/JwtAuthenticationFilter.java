@@ -1,19 +1,13 @@
 package covoit.config;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.stream.Collectors;
-
-import org.springframework.lang.NonNull;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.util.StringUtils;
-import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 
@@ -22,8 +16,12 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
-public class JwtAuthenticationFilter extends OncePerRequestFilter  {
+public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
@@ -33,26 +31,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter  {
         this.userDetailsService = userDetailsService;
     }
 
-    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        String token = jwtService.extractToken(request);
-
-        if (token != null && jwtService.validateToken(token)) {
-            String username = jwtService.getUsernameFromToken(token);
-
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                // Charger les détails de l'utilisateur
+        String token = getJwtFromRequest(request);
+        if (StringUtils.hasText(token) && jwtService.validateToken(token)) {
+            try {
+                String username = jwtService.getUsernameFromToken(token);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-                // Si le token est valide avec les détails utilisateur
-                UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null,
+                        getAuthoritiesFromToken(token));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+            } catch (JWTVerificationException e) {
+                // Handle the exception (optional: log it)
             }
         }
-        filterChain.doFilter(request, response);
+        chain.doFilter(request, response);
     }
+
 
     /**
      * Extrait le token JWT de l'en-tête de la requête HTTP.

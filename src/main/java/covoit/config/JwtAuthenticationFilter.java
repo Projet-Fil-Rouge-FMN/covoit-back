@@ -1,64 +1,53 @@
 package covoit.config;
 
-import covoit.services.JwtService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.NonNull;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.util.StringUtils;
+
+import com.auth0.jwt.exceptions.JWTVerificationException;
+
+import covoit.services.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.constraints.NotNull;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-/**
- * Filtre de sécurité pour l'authentification basée sur JWT (JSON Web Token).
- * Vérifie la présence d'un token JWT dans l'en-tête de la requête, valide le token,
- * extrait les informations d'authentification et définit le contexte de sécurité.
- */
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    @Autowired
-    private JwtService jwtService;
+    private final JwtService jwtService;
+    private final UserDetailsService userDetailsService;
 
-    /**
-     * Filtre les requêtes HTTP pour vérifier et extraire l'authentification à partir d'un token JWT.
-     *
-     * @param request La requête HTTP.
-     * @param response La réponse HTTP.
-     * @param chain La chaîne de filtres.
-     * @throws IOException En cas d'erreur d'entrée/sortie.
-     * @throws ServletException En cas d'erreur de servlet.
-     */
-    @Override
-    protected void doFilterInternal( @NonNull HttpServletRequest request,@NonNull HttpServletResponse response,@NonNull FilterChain chain)
+    public JwtAuthenticationFilter(JwtService jwtService, UserDetailsService userDetailsService) {
+        this.jwtService = jwtService;
+        this.userDetailsService = userDetailsService;
+    }
+
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        try {
-            String token = getJwtFromRequest(request);
-
-            if (token != null && jwtService.verifyToken(token) != null) {
+        String token = getJwtFromRequest(request);
+        if (StringUtils.hasText(token) && jwtService.validateToken(token)) {
+            try {
                 String username = jwtService.getUsernameFromToken(token);
-                Collection<SimpleGrantedAuthority> authorities = getAuthoritiesFromToken(token);
-
-                Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null,
+                        getAuthoritiesFromToken(token));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+            } catch (JWTVerificationException e) {
+                // Handle the exception (optional: log it)
             }
-        } catch (Exception ex) {
-            SecurityContextHolder.clearContext();
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
         }
-
         chain.doFilter(request, response);
     }
+
 
     /**
      * Extrait le token JWT de l'en-tête de la requête HTTP.
@@ -68,22 +57,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      */
     private String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
         return null;
     }
 
     /**
-     * Extrait les rôles d'un token JWT et les convertit en une collection d'autorités Spring Security.
+     * Extrait les rôles d'un token JWT et les convertit en une collection
+     * d'autorités Spring Security.
      *
      * @param token Le token JWT dont extraire les rôles.
      * @return Une collection d'autorités représentant les rôles extraits du token.
+     * @throws JWTVerificationException Si le token est invalide.
      */
-    private Collection<SimpleGrantedAuthority> getAuthoritiesFromToken(String token) {
-        String[] roles = jwtService.getRolesFromToken(token);
+    private Collection<SimpleGrantedAuthority> getAuthoritiesFromToken(String token) throws JWTVerificationException {
+        String[] roles;
+        try {
+            roles = jwtService.getRolesFromToken(token);
+        } catch (JWTVerificationException e) {
+            // Handle the exception (optional: log it)
+            throw e; // Rethrow if you want to propagate it
+        }
         return Arrays.stream(roles)
-                     .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                     .collect(Collectors.toList());
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                .collect(Collectors.toList());
     }
 }

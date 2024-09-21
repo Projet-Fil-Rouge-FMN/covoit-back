@@ -99,13 +99,10 @@ class SecurityConfigTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testDeleteUserById() throws Exception {
-        int userId = 1;
-
-        // Mock du comportement du service
-        when(userAccountService.deleteUserById(userId)).thenReturn(true);
-
+   
+        mockMvc.perform(delete("/user/1"))
          .andExpect(status().isOk()) // attend un statut 200
-         
+         .andExpect(content().string("User deleted successfully"));
     }
     
     @Test

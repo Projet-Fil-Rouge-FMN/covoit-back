@@ -115,23 +115,31 @@ public class UserAccountService {
 	 *         interdite
 	 */
 	public boolean deleteUserById(int id) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new RuntimeException("L'utilisateur courant n'est pas authentifié.");
-        }
+	    System.out.println("Attempting to delete user with ID: " + id);
 
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        if (userDetails.getId() == id) {
-            throw new RuntimeException("Vous ne pouvez pas supprimer votre propre compte.");
-        }
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    if (authentication == null || !authentication.isAuthenticated()) {
+	        System.err.println("User is not authenticated");
+	        throw new RuntimeException("L'utilisateur courant n'est pas authentifié.");
+	    }
 
-        if (repository.existsById(id)) {
-        	repository.deleteById(id);
-            return true;
-        } else {
-            return false;
-        }
-    }
+	    CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+	    if (userDetails.getId() == id) {
+	        System.err.println("User cannot delete their own account");
+	        throw new RuntimeException("Vous ne pouvez pas supprimer votre propre compte.");
+	    }
+
+	    if (repository.existsById(id)) {
+	        System.out.println("User exists, proceeding with deletion");
+	        repository.deleteById(id);
+	        return true;
+	    } else {
+	        System.err.println("User with ID " + id + " not found");
+	        return false;
+	    }
+	}
+
+
 	public void create(UserAccount userAccount) {
 	    // Vérifier si l'utilisateur existe déjà en utilisant Optional
 	    Optional<UserAccount> existingUser = Optional.ofNullable(repository.findByUserName(userAccount.getUserName()));

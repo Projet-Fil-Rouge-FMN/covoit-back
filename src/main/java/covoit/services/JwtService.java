@@ -7,9 +7,6 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
-
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -33,20 +30,6 @@ public class JwtService {
         this.SECRET_KEY = secretKey;
     }
 
-    private static final String AUTH_HEADER = "Authorization";
-    private static final String TOKEN_PREFIX = "Bearer ";
-
-    // Cette méthode extrait le token JWT de l'en-tête Authorization
-    public String extractToken(HttpServletRequest request) {
-        String authHeader = request.getHeader(AUTH_HEADER);
-        
-        // Vérifie si l'en-tête Authorization contient un token
-        if (authHeader != null && authHeader.startsWith(TOKEN_PREFIX)) {
-            // Supprime le préfixe "Bearer " et retourne uniquement le token
-            return authHeader.substring(TOKEN_PREFIX.length());
-        }
-        return null;
-    }
     public boolean validateToken(String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY);

@@ -5,6 +5,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.util.StringUtils;
@@ -83,4 +85,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                 .collect(Collectors.toList());
     }
+    @Autowired
+    private AuthenticationTrustResolver authenticationTrustResolver;
+
+    public boolean isAnonymous(Authentication authentication) {
+        return authenticationTrustResolver.isAnonymous(authentication);
+    }
+
 }

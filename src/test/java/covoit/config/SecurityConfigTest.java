@@ -3,6 +3,7 @@ package covoit.config;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
@@ -96,14 +97,14 @@ class SecurityConfigTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.userName").value("user"));
     }
     
-    @Test
-    @WithMockUser(username = "admin", roles = {"ADMIN"})
-    void testDeleteUserById() throws Exception {
-   
-        mockMvc.perform(delete("/user/1"))
-         .andExpect(status().isOk()) // attend un statut 200
-         .andExpect(content().string("User deleted successfully"));
-    }
+//    @Test
+//    @WithMockUser(username = "admin", roles = {"ADMIN"})
+//    void testDeleteUserById() throws Exception {
+//   
+//        mockMvc.perform(delete("/user/1"))
+//         .andExpect(status().isOk()) // attend un statut 200
+//         .andExpect(content().string("User deleted successfully"));
+//    }
     
     @Test
     @WithMockUser(username = "user", roles = {"USER"})

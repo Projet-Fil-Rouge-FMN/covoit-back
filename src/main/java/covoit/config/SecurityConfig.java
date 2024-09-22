@@ -14,9 +14,11 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
@@ -38,7 +40,7 @@ public class SecurityConfig implements WebMvcConfigurer {
 	    http
 	        .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Application de la configuration CORS
 	        .authorizeHttpRequests(authorize -> authorize
-	            .requestMatchers("/user/", "/user/register", "auth/**", "/**", "/swagger-ui/", "/error")
+	            .requestMatchers("/user/", "/user/register", "auth/**", "/**", "/swagger-ui/")
 	            .permitAll()
 	            .requestMatchers("/user/{id}")
 	            .hasRole("USER")
@@ -48,10 +50,17 @@ public class SecurityConfig implements WebMvcConfigurer {
 	        .httpBasic(Customizer.withDefaults())
 	        .securityContext((context -> context.securityContextRepository(repo)))
 	        .csrf(csrf -> csrf.disable())
-	        .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-
+	        
+	        .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+	        .addFilterBefore(anonymousAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 	    return http.build();
 	}
+	   // Définition du filtre d'authentification anonyme
+    @Bean
+    public AnonymousAuthenticationFilter anonymousAuthenticationFilter() {
+        return new AnonymousAuthenticationFilter("uniqueKeyForAnonymous", "anonymousUser",
+                AuthorityUtils.createAuthorityList("ROLE_ANONYMOUS"));
+    }
 
 	  @Autowired
 	    private AuthenticationConfiguration authenticationConfiguration;

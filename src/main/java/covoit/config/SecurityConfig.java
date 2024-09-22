@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationTrustResolver;
+import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -61,7 +63,10 @@ public class SecurityConfig implements WebMvcConfigurer {
         return new AnonymousAuthenticationFilter("uniqueKeyForAnonymous", "anonymousUser",
                 AuthorityUtils.createAuthorityList("ROLE_ANONYMOUS"));
     }
-
+    @Bean
+    public AuthenticationTrustResolver authenticationTrustResolver() {
+        return new AuthenticationTrustResolverImpl();
+    }
 	  @Autowired
 	    private AuthenticationConfiguration authenticationConfiguration;
 	 @Value("${jwt.secret}")

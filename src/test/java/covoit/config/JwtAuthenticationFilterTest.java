@@ -13,12 +13,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import covoit.ConvoitBackApplication;
 import covoit.dtos.UserAccountDto;
 import covoit.repository.UserAccountRepository;
 import covoit.services.JwtService;
 import covoit.services.UserAccountService;
 
-@SpringBootTest
+@SpringBootTest(classes = ConvoitBackApplication.class)
 @AutoConfigureMockMvc
 class JwtAuthenticationFilterTest {
 

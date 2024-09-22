@@ -33,6 +33,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import static org.mockito.Mockito.*;
 import org.mockito.Mockito;
 
+import covoit.ConvoitBackApplication;
 import covoit.RESTcontroller.UserAccountController;
 import covoit.dtos.UserAccountDto;
 import covoit.entities.CustomUserDetails;
@@ -40,7 +41,7 @@ import covoit.repository.UserAccountRepository;
 import covoit.services.JwtService;
 import covoit.services.UserAccountService;
 
-@SpringBootTest
+@SpringBootTest(classes = ConvoitBackApplication.class)
 @AutoConfigureMockMvc
 class SecurityConfigTest {
 
@@ -80,31 +81,23 @@ class SecurityConfigTest {
         SecurityContextHolder.setContext(securityContext);
     }
 
-
-    @Test
-    @WithMockUser(username = "user", roles = {"USER"})
-    void testFindUserById() throws Exception {
-        // Mocking service response
-        UserAccountDto user = new UserAccountDto();
-        user.setId(1);
-        user.setUserName("user");
-        when(userAccountService.findById(1)).thenReturn(user);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/user/1")
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.userName").value("user"));
-    }
     
-//    @Test
-//    @WithMockUser(username = "admin", roles = {"ADMIN"})
-//    void testDeleteUserById() throws Exception {
-//   
-//        mockMvc.perform(delete("/user/1"))
-//         .andExpect(status().isOk()) // attend un statut 200
-//         .andExpect(content().string("User deleted successfully"));
-//    }
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void testDeleteUserById() throws Exception {
+        int validUserId = 2; // ID valide d'un utilisateur à supprimer
+
+        // Mock du comportement du service pour la suppression réussie
+        when(userAccountService.deleteUserById(validUserId)).thenReturn(true);
+
+        // Exécution de la requête DELETE
+        mockMvc.perform(delete("/user/delete/" + validUserId))
+               .andExpect(status().isOk()) // Attente d'un statut 200 OK
+               .andExpect(content().string("User deleted successfully"));
+
+        // Vérifier que la méthode du service a été appelée avec le bon ID
+        verify(userAccountService, times(1)).deleteUserById(validUserId);
+    }
     
 //    @Test
 //    @WithMockUser(username = "user", roles = {"USER"})

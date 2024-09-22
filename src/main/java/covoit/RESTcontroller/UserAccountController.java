@@ -54,12 +54,14 @@ public class UserAccountController {
     @PutMapping("/update/{id}")
     public void update(@PathVariable int id, @RequestBody UserAccountDto userDto) {
         userAccountService.update(id, userDto);
+        
     }
     
 
     @DeleteMapping("/delete/{id}")
-    public void deleteUser(@PathVariable int id) {
+    public ResponseEntity<String> deleteUser(@PathVariable int id) {
     	 userAccountService.deleteUserById(id);
+    	 return ResponseEntity.ok("User deleted successfully");
     }
 
 

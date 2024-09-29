@@ -13,6 +13,7 @@ import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -30,6 +31,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import covoit.entities.UserAccount;
 import covoit.repository.UserAccountRepository;
+import covoit.services.CustomUserDetailsService;
 import covoit.services.JwtService;
 
 @Configuration
@@ -77,7 +79,12 @@ public class SecurityConfig implements WebMvcConfigurer {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
 
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(customUserDetailsService);
+    }
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
         JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtService, userDetailsService);
@@ -96,6 +103,7 @@ public class SecurityConfig implements WebMvcConfigurer {
 	    configuration.setAllowedOrigins(List.of("http://localhost:4200","https://projet-fil-rouge-fmn.github.io/"));
 	    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 	    configuration.setAllowedHeaders(Arrays.asList("*"));
+	    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
 	    configuration.setAllowCredentials(true);
 	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 	    source.registerCorsConfiguration("/**", configuration);

@@ -22,6 +22,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (userAccount == null) {
             throw new UsernameNotFoundException("User not found");
         }
+        System.out.println("User found: " + userAccount.getUserName());
         return new CustomUserDetails(userAccount);
     }
+
 }

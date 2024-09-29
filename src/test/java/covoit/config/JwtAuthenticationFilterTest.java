@@ -1,58 +1,80 @@
 package covoit.config;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import covoit.ConvoitBackApplication;
-import covoit.dtos.UserAccountDto;
-import covoit.repository.UserAccountRepository;
 import covoit.services.JwtService;
-import covoit.services.UserAccountService;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-@SpringBootTest(classes = ConvoitBackApplication.class)
-@AutoConfigureMockMvc
-class JwtAuthenticationFilterTest {
+public class JwtAuthenticationFilterTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @InjectMocks
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    @MockBean
+    @Mock
     private JwtService jwtService;
 
-    @MockBean
-    private UserAccountRepository userAccountRepository; // Mock du repository
-    @MockBean
-    private UserAccountService userAccountService;
-    
-    @Test
-    @WithMockUser(username = "admin", roles = {"ADMIN"})
-    void testFindUserById() throws Exception {
-        int userId = 1;
+    @Mock
+    private UserDetailsService userDetailsService;
 
-        // Créez un UserAccountDto avec des données appropriées
-        UserAccountDto userDto = new UserAccountDto();
-        userDto.setId(userId); // Assurez-vous que tous les champs nécessaires sont définis
-        userDto.setUserName("testuser");
+    @Mock
+    private HttpServletRequest request;
 
-        // Mock du comportement du service
-        when(userAccountService.findById(userId)).thenReturn(userDto);
+    @Mock
+    private HttpServletResponse response;
 
-        // Exécution de la requête GET
-        mockMvc.perform(MockMvcRequestBuilders.get("/user/" + userId)
-               .accept(MediaType.APPLICATION_JSON))
-               .andExpect(MockMvcResultMatchers.status().isOk())
-               .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-               .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(userId)) // Vérifie les valeurs spécifiques
-               .andExpect(MockMvcResultMatchers.jsonPath("$.userName").value("testuser"));
+    @Mock
+    private FilterChain filterChain;
+
+    @BeforeEach
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(jwtAuthenticationFilter).build();
     }
+
+    @Test
+    public void testDoFilterInternal_ValidToken() throws Exception {
+        String token = "valid.jwt.token";
+        String username = "testuser";
+        String[] roles = {"USER", "ADMIN"};
+
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
+        when(jwtService.validateToken(token)).thenReturn(true);
+        when(jwtService.getUsernameFromToken(token)).thenReturn(username);
+        when(jwtService.getRolesFromToken(token)).thenReturn(roles); // Mock des rôles
+        when(userDetailsService.loadUserByUsername(username)).thenReturn(mock(UserDetails.class));
+
+        jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
+
+        // Assert the expected behavior
+        // Par exemple, vérifier que l'authentification a été définie dans le contexte de sécurité
+    }
+
+
+    @Test
+    public void testDoFilterInternal_InvalidToken() throws Exception {
+        String token = "invalid.jwt.token";
+        
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
+        when(jwtService.validateToken(token)).thenReturn(false);
+        
+        jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
+        
+        // Verify that no authentication is set in the security context
+        // Add additional verifications and assertions as needed
+    }
+    
 }

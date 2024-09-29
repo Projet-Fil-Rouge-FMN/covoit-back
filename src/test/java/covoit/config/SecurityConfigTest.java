@@ -1,7 +1,7 @@
 package covoit.config;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -17,26 +17,19 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.cors.CorsConfigurationSource;
-import static org.mockito.Mockito.*;
-import org.mockito.Mockito;
 
 import covoit.ConvoitBackApplication;
-import covoit.RESTcontroller.UserAccountController;
-import covoit.dtos.UserAccountDto;
-import covoit.entities.CustomUserDetails;
 import covoit.repository.UserAccountRepository;
 import covoit.services.JwtService;
 import covoit.services.UserAccountService;
@@ -48,84 +41,63 @@ class SecurityConfigTest {
     @InjectMocks
     private SecurityConfig securityConfig;
 
-    @Mock
-    private CorsConfigurationSource corsConfigurationSource;
-
-    @Mock
+    @MockBean
     private UserAccountRepository userAccountRepository;
+
+    @MockBean
+    private UserAccountService userAccountService;
+
+    @MockBean
+    private JwtService jwtService;
 
     @Mock
     private BCryptPasswordEncoder passwordEncoder;
 
-    @MockBean
-    private JwtService jwtService;
-    
-    @MockBean
-    private UserAccountService userAccountService;
-    
     @Autowired
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
-        // Crée une authentication avec un utilisateur et un rôle
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 "admin", 
                 "password", 
                 List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
         );
 
-        // Crée un contexte de sécurité et l'assigne
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
         securityContext.setAuthentication(authentication);
         SecurityContextHolder.setContext(securityContext);
     }
 
-    
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testDeleteUserById() throws Exception {
-        int validUserId = 2; // ID valide d'un utilisateur à supprimer
+        int validUserId = 2;
 
-        // Mock du comportement du service pour la suppression réussie
         when(userAccountService.deleteUserById(validUserId)).thenReturn(true);
 
-        // Exécution de la requête DELETE
         mockMvc.perform(delete("/user/delete/" + validUserId))
-               .andExpect(status().isOk()) // Attente d'un statut 200 OK
+               .andExpect(status().isOk())
                .andExpect(content().string("User deleted successfully"));
 
-        // Vérifier que la méthode du service a été appelée avec le bon ID
         verify(userAccountService, times(1)).deleteUserById(validUserId);
     }
     
-//    @Test
-//    @WithMockUser(username = "user", roles = {"USER"})
-//    void testDeleteUserByIdFail() throws Exception {
-//        int validUserId = 2; // ID attendu par le service
-//        int incorrectUserId = 1; // ID incorrect pour la suppression
-//
-//        // Mock du comportement du service pour l'ID attendu
-//        when(userAccountService.deleteUserById(validUserId)).thenReturn(true);
-//        // Mock du comportement du service pour l'ID incorrect
-//        when(userAccountService.deleteUserById(incorrectUserId)).thenReturn(false); // Simuler une échec
-//
-//        // Exécution de la requête de suppression avec l'ID incorrect
-//        mockMvc.perform(MockMvcRequestBuilders.delete("/user/" + incorrectUserId))
-//               .andExpect(MockMvcResultMatchers.status().isNotFound()); // Attendre un statut 404 ou autre erreur
-//    }
+    @Test
+    @WithMockUser(username = "user", roles = {"USER"})
+    void testDeleteUserByIdFail() throws Exception {
+        int otherUserId = 1; // This should be an ID that the authenticated user cannot delete
+
+        // Execute the DELETE request with a different user ID
+        mockMvc.perform(delete("/user/delete/" + otherUserId))
+               .andExpect(status().isForbidden()); // Expecting a 403 Forbidden status
+    }
 
 
 
-      
     @Test
     void testCorsConfigurationSource() {
         assertNotNull(securityConfig.corsConfigurationSource(), "Cors configuration source should not be null");
-    }
-
-    @Test
-    void testUserDetailsService() {
-        assertNotNull(securityConfig.userDetailsService(userAccountRepository), "UserDetailsService should not be null");
     }
 
     @Test

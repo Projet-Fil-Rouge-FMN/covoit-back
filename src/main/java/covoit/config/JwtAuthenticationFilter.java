@@ -43,9 +43,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null,
                         getAuthoritiesFromToken(token));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+                // Ajoutez un log ici
+                System.out.println("Authentication successful for user: " + username);
             } catch (JWTVerificationException e) {
-                // Handle the exception (optional: log it)
+                // Ajoutez un log d'erreur ici
+                System.out.println("JWT verification failed: " + e.getMessage());
             }
+        } else {
+            System.out.println("No valid JWT found");
         }
         chain.doFilter(request, response);
     }

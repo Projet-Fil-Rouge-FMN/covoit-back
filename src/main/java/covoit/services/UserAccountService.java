@@ -10,6 +10,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import covoit.dtos.LoginRequestDto;
 import covoit.dtos.UserAccountDto;
 import covoit.entities.CustomUserDetails;
 import covoit.entities.UserAccount;
@@ -91,20 +93,20 @@ public class UserAccountService {
 	}
 
 	public UserAccount login(String username, String rawPassword) throws AnomalieException {
-		// Rechercher l'utilisateur
-		UserAccount user = repository.findByUserName(username);
+	    // Rechercher l'utilisateur
+	    UserAccount user = repository.findByUserName(username);
 
-		// Vérifier si l'utilisateur existe
-		if (user == null) {
-			throw new AnomalieException("Nom d'utilisateur ou mot de passe incorrect");
-		}
+	    // Vérifier si l'utilisateur existe
+	    if (user == null) {
+	        throw new AnomalieException("Nom d'utilisateur ou mot de passe incorrect");
+	    }
 
-		// Vérifier le mot de passe
-		if (bCryptPasswordEncoder.matches(rawPassword, user.getPassword())) {
-			return user; // Authentification réussie
-		} else {
-			throw new AnomalieException("Nom d'utilisateur ou mot de passe incorrect");
-		}
+	    // Vérifier le mot de passe
+	    if (bCryptPasswordEncoder.matches(rawPassword, user.getPassword())) {
+	        return user; // Authentification réussie
+	    } else {
+	        throw new AnomalieException("Nom d'utilisateur ou mot de passe incorrect");
+	    }
 	}
 
 	/**
@@ -115,29 +117,37 @@ public class UserAccountService {
 	 *         interdite
 	 */
 	public boolean deleteUserById(int id) {
-	    System.out.println("Attempting to delete user with ID: " + id);
+	  //  System.out.println("Attempting to delete user with ID: " + id);
 
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 	    if (authentication == null || !authentication.isAuthenticated()) {
-	        System.err.println("User is not authenticated");
+	      //  System.err.println("User is not authenticated");
 	        throw new RuntimeException("L'utilisateur courant n'est pas authentifié.");
 	    }
 
-	    CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+	    Object principal = authentication.getPrincipal();
+	    if (!(principal instanceof CustomUserDetails)) {
+	   //     System.err.println("Expected CustomUserDetails but got: " + principal.getClass().getName());
+	        throw new ClassCastException("Expected CustomUserDetails but got: " + principal.getClass().getName());
+	    }
+
+	    CustomUserDetails userDetails = (CustomUserDetails) principal;
 	    if (userDetails.getId() == id) {
-	        System.err.println("User cannot delete their own account");
+	    //    System.err.println("User cannot delete their own account");
 	        throw new RuntimeException("Vous ne pouvez pas supprimer votre propre compte.");
 	    }
 
-	    if (repository.existsById(id)) {
-	        System.out.println("User exists, proceeding with deletion");
-	        repository.deleteById(id);
-	        return true;
-	    } else {
-	        System.err.println("User with ID " + id + " not found");
+	    Optional<UserAccount> userDB = repository.findById(id);
+	    if (!userDB.isPresent()) {
+	    //    System.err.println("User with ID " + id + " not found");
 	        return false;
 	    }
+
+	    //System.out.println("User exists, proceeding with deletion");
+	    repository.deleteById(id);
+	    return true;
 	}
+
 
 
 	public void create(UserAccount userAccount) {

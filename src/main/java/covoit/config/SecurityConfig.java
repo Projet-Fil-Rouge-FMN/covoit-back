@@ -64,7 +64,7 @@ public class SecurityConfig implements WebMvcConfigurer {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/user/", "/user/register", "auth/**", "/**", "/swagger-ui/")
+                .requestMatchers("/user/", "/user/register", "auth/**", "/**", "/swagger-ui/", "/", "/error")
                 .permitAll()
                 .requestMatchers("/user/{id}").hasRole("USER")
                 //.requestMatchers("/**", "/user/delete/**")

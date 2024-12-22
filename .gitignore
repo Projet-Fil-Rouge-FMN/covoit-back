@@ -10,3 +10,4 @@ application.properties
 .metadata/.log
 /src/test/*
 /covoit-back1/src/main/java/covoit/services/ServiceVehicleService.java
+/covoitDb.trace.db

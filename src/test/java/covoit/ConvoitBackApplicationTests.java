@@ -1,4 +1,5 @@
 package covoit;
+
 import covoit.dtos.AddressDto;
 import covoit.entities.Address;
 import covoit.exception.AnomalieException;
@@ -9,8 +10,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -80,7 +83,7 @@ class AddressServiceTest {
     }
 
     @Test
-    void testCreateAddress_Duplicate() {
+    void testCreateAddress_Duplicate() throws AnomalieException {
         Address mockAddress = new Address("Detail", "City", "Country");
         AddressDto dto = new AddressDto();
         dto.setDetail("Detail");
@@ -98,16 +101,17 @@ class AddressServiceTest {
     @Test
     void testCreateAddress_MissingFields() {
         AddressDto dto = new AddressDto();
-        dto.setDetail("");
+        dto.setDetail("");  // Champ vide
         dto.setCity("City");
-        dto.setCountry("");
+        dto.setCountry(""); // Champ vide
 
-        Exception exception = assertThrows(AnomalieException.class, () -> addressService.create(dto));
+        // Test que l'exception est bien levée lorsque les champs sont manquants
+        AnomalieException exception = assertThrows(AnomalieException.class, () -> addressService.create(dto));
         assertEquals("Les champs Detail et Country ne doivent pas être vides.", exception.getMessage());
     }
 
     @Test
-    void testUpdateAddress_Success() {
+    void testUpdateAddress_Success() throws AnomalieException {
         Address mockAddress = new Address("OldDetail", "OldCity", "OldCountry");
         when(addressRepository.findById(1)).thenReturn(mockAddress);
 
@@ -124,7 +128,7 @@ class AddressServiceTest {
     }
 
     @Test
-    void testUpdateAddress_NotFound() {
+    void testUpdateAddress_NotFound() throws AnomalieException {
         when(addressRepository.findById(1)).thenReturn(null);
 
         AddressDto dto = new AddressDto();
@@ -141,11 +145,12 @@ class AddressServiceTest {
     @Test
     void testUpdateAddress_MissingFields() {
         AddressDto dto = new AddressDto();
-        dto.setDetail("");
+        dto.setDetail("");  // Champ vide
         dto.setCity("City");
-        dto.setCountry("");
+        dto.setCountry(""); // Champ vide
 
-        Exception exception = assertThrows(AnomalieException.class, () -> addressService.update(1, dto));
+        // Test que l'exception est bien levée lorsque les champs sont manquants
+        AnomalieException exception = assertThrows(AnomalieException.class, () -> addressService.update(1, dto));
         assertEquals("Les champs Detail et Country ne doivent pas être vides.", exception.getMessage());
     }
 
